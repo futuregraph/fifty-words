@@ -1,0 +1,23 @@
+// This is the top-level scss file. Import all other files in here.
+@import 'home';
+
+html {
+  font: 16px/1.5 'Helvetica', 'Arial', sans-serif;
+}
+
+h1 {
+  color: #162556;
+}
+
+.app-wrapper {
+  margin: auto 50px;
+}
+
+.instructions {
+  background-color: #afbcff;
+  border: 1px dashed #565656;
+  padding:25px;
+  border-radius:10px;
+  margin-bottom:50px;
+  margin-left:-25px;
+}
