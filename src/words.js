@@ -23,5 +23,5 @@ const WORDS_DB = [
 ]
 
 
-export const getRandomList = () => WORDS_DB[Math.floor(Math.random() * WORDS_DB.length)]
+export const getWordsList = () => WORDS_DB[Math.floor(Math.random() * WORDS_DB.length)]
 export default WORDS_DB

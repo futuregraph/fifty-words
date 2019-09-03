@@ -1,15 +1,15 @@
 import React, {Component} from 'react';
-import {getRandomList} from './data'
+import {getWordsList} from './words'
 
 const Word = ({word}) => <span className="words-list__item">{word}</span>
 const Instructions = () => <div className="instructions">
     Представляйте образ каждого слова ярко, в цвете 🌈. С ощущениями прикосновений 👆, звуками👂, запахами👃, а где это возможно - и со вкусом 👅.
-    Если этот набор слов уже вам встречался – просто перезагрузите страницу (пока так)
+    Если этот набор слов уже вам встречался – просто перезагрузите страницу
 </div>
 
 class App extends Component {
     render() {
-        const words = getRandomList()
+        const words = getWordsList()
         return (
             <div className="app-wrapper">
                 <h1>Упражнение "Оживление 50 слов"</h1>
