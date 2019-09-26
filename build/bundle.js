@@ -63,7 +63,7 @@
 /******/ 	__webpack_require__.p = "";
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 194);
+/******/ 	return __webpack_require__(__webpack_require__.s = 195);
 /******/ })
 /************************************************************************/
 /******/ ([
@@ -240,6 +240,10 @@ process.off = noop;
 process.removeListener = noop;
 process.removeAllListeners = noop;
 process.emit = noop;
+process.prependListener = noop;
+process.prependOnceListener = noop;
+
+process.listeners = function (name) { return [] }
 
 process.binding = function (name) {
     throw new Error('process.binding is not supported');
@@ -259,11 +263,9 @@ process.umask = function() { return 0; };
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
@@ -320,12 +322,10 @@ module.exports = invariant;
 
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
- * Copyright 2014-2015, Facebook, Inc.
- * All rights reserved.
+ * Copyright (c) 2014-present, Facebook, Inc.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
@@ -343,45 +343,43 @@ var emptyFunction = __webpack_require__(9);
 var warning = emptyFunction;
 
 if (process.env.NODE_ENV !== 'production') {
-  (function () {
-    var printWarning = function printWarning(format) {
-      for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-        args[_key - 1] = arguments[_key];
+  var printWarning = function printWarning(format) {
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    var argIndex = 0;
+    var message = 'Warning: ' + format.replace(/%s/g, function () {
+      return args[argIndex++];
+    });
+    if (typeof console !== 'undefined') {
+      console.error(message);
+    }
+    try {
+      // --- Welcome to debugging React ---
+      // This error was thrown as a convenience so that you can use this stack
+      // to find the callsite that caused this warning to fire.
+      throw new Error(message);
+    } catch (x) {}
+  };
+
+  warning = function warning(condition, format) {
+    if (format === undefined) {
+      throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
+    }
+
+    if (format.indexOf('Failed Composite propType: ') === 0) {
+      return; // Ignore CompositeComponent proptype check.
+    }
+
+    if (!condition) {
+      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+        args[_key2 - 2] = arguments[_key2];
       }
 
-      var argIndex = 0;
-      var message = 'Warning: ' + format.replace(/%s/g, function () {
-        return args[argIndex++];
-      });
-      if (typeof console !== 'undefined') {
-        console.error(message);
-      }
-      try {
-        // --- Welcome to debugging React ---
-        // This error was thrown as a convenience so that you can use this stack
-        // to find the callsite that caused this warning to fire.
-        throw new Error(message);
-      } catch (x) {}
-    };
-
-    warning = function warning(condition, format) {
-      if (format === undefined) {
-        throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
-      }
-
-      if (format.indexOf('Failed Composite propType: ') === 0) {
-        return; // Ignore CompositeComponent proptype check.
-      }
-
-      if (!condition) {
-        for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-          args[_key2 - 2] = arguments[_key2];
-        }
-
-        printWarning.apply(undefined, [format].concat(args));
-      }
-    };
-  })();
+      printWarning.apply(undefined, [format].concat(args));
+    }
+  };
 }
 
 module.exports = warning;
@@ -544,7 +542,7 @@ module.exports = shouldUseNative() ? Object.assign : function (target, source) {
 var _prodInvariant = __webpack_require__(3);
 
 var DOMProperty = __webpack_require__(13);
-var ReactDOMComponentFlags = __webpack_require__(60);
+var ReactDOMComponentFlags = __webpack_require__(58);
 
 var invariant = __webpack_require__(1);
 
@@ -732,11 +730,9 @@ module.exports = ReactDOMComponentTree;
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
@@ -1170,7 +1166,7 @@ module.exports = ReactComponentTreeHook;
 var debugTool = null;
 
 if (process.env.NODE_ENV !== 'production') {
-  var ReactDebugTool = __webpack_require__(136);
+  var ReactDebugTool = __webpack_require__(134);
   debugTool = ReactDebugTool;
 }
 
@@ -1186,11 +1182,9 @@ module.exports = { debugTool: debugTool };
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * 
  */
@@ -1239,9 +1233,9 @@ module.exports = emptyFunction;
 var _prodInvariant = __webpack_require__(3),
     _assign = __webpack_require__(4);
 
-var CallbackQueue = __webpack_require__(58);
+var CallbackQueue = __webpack_require__(56);
 var PooledClass = __webpack_require__(14);
-var ReactFeatureFlags = __webpack_require__(63);
+var ReactFeatureFlags = __webpack_require__(61);
 var ReactReconciler = __webpack_require__(17);
 var Transaction = __webpack_require__(28);
 
@@ -2135,7 +2129,7 @@ var warning = __webpack_require__(2);
 var canDefineProperty = __webpack_require__(31);
 var hasOwnProperty = Object.prototype.hasOwnProperty;
 
-var REACT_ELEMENT_TYPE = __webpack_require__(80);
+var REACT_ELEMENT_TYPE = __webpack_require__(78);
 
 var RESERVED_PROPS = {
   key: true,
@@ -2476,7 +2470,7 @@ var DOMNamespaces = __webpack_require__(34);
 var setInnerHTML = __webpack_require__(30);
 
 var createMicrosoftUnsafeLocalFunction = __webpack_require__(41);
-var setTextContent = __webpack_require__(77);
+var setTextContent = __webpack_require__(75);
 
 var ELEMENT_NODE_TYPE = 1;
 var DOCUMENT_FRAGMENT_NODE_TYPE = 11;
@@ -2593,7 +2587,7 @@ module.exports = DOMLazyTree;
 
 
 
-var ReactRef = __webpack_require__(150);
+var ReactRef = __webpack_require__(148);
 var ReactInstrumentation = __webpack_require__(8);
 
 var warning = __webpack_require__(2);
@@ -2765,15 +2759,15 @@ module.exports = ReactReconciler;
 
 var _assign = __webpack_require__(4);
 
-var ReactBaseClasses = __webpack_require__(79);
-var ReactChildren = __webpack_require__(180);
-var ReactDOMFactories = __webpack_require__(181);
+var ReactBaseClasses = __webpack_require__(77);
+var ReactChildren = __webpack_require__(181);
+var ReactDOMFactories = __webpack_require__(182);
 var ReactElement = __webpack_require__(15);
-var ReactPropTypes = __webpack_require__(183);
-var ReactVersion = __webpack_require__(185);
+var ReactPropTypes = __webpack_require__(184);
+var ReactVersion = __webpack_require__(186);
 
-var createReactClass = __webpack_require__(187);
-var onlyChild = __webpack_require__(189);
+var createReactClass = __webpack_require__(188);
+var onlyChild = __webpack_require__(190);
 
 var createElement = ReactElement.createElement;
 var createFactory = ReactElement.createFactory;
@@ -2782,7 +2776,7 @@ var cloneElement = ReactElement.cloneElement;
 if (process.env.NODE_ENV !== 'production') {
   var lowPriorityWarning = __webpack_require__(48);
   var canDefineProperty = __webpack_require__(31);
-  var ReactElementValidator = __webpack_require__(81);
+  var ReactElementValidator = __webpack_require__(79);
   var didWarnPropTypesDeprecated = false;
   createElement = ReactElementValidator.createElement;
   createFactory = ReactElementValidator.createFactory;
@@ -2947,8 +2941,8 @@ var EventPluginRegistry = __webpack_require__(25);
 var EventPluginUtils = __webpack_require__(35);
 var ReactErrorUtils = __webpack_require__(39);
 
-var accumulateInto = __webpack_require__(70);
-var forEachAccumulated = __webpack_require__(71);
+var accumulateInto = __webpack_require__(68);
+var forEachAccumulated = __webpack_require__(69);
 var invariant = __webpack_require__(1);
 
 /**
@@ -3222,8 +3216,8 @@ module.exports = EventPluginHub;
 var EventPluginHub = __webpack_require__(20);
 var EventPluginUtils = __webpack_require__(35);
 
-var accumulateInto = __webpack_require__(70);
-var forEachAccumulated = __webpack_require__(71);
+var accumulateInto = __webpack_require__(68);
+var forEachAccumulated = __webpack_require__(69);
 var warning = __webpack_require__(2);
 
 var getListener = EventPluginHub.getListener;
@@ -3460,11 +3454,9 @@ module.exports = SyntheticUIEvent;
 "use strict";
 /* WEBPACK VAR INJECTION */(function(process) {/**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
@@ -3754,10 +3746,10 @@ module.exports = EventPluginRegistry;
 var _assign = __webpack_require__(4);
 
 var EventPluginRegistry = __webpack_require__(25);
-var ReactEventEmitterMixin = __webpack_require__(140);
-var ViewportMetrics = __webpack_require__(69);
+var ReactEventEmitterMixin = __webpack_require__(138);
+var ViewportMetrics = __webpack_require__(67);
 
-var getVendorPrefixedEventName = __webpack_require__(175);
+var getVendorPrefixedEventName = __webpack_require__(173);
 var isEventSupported = __webpack_require__(45);
 
 /**
@@ -4079,7 +4071,7 @@ module.exports = ReactBrowserEventEmitter;
 
 
 var SyntheticUIEvent = __webpack_require__(23);
-var ViewportMetrics = __webpack_require__(69);
+var ViewportMetrics = __webpack_require__(67);
 
 var getEventModifierState = __webpack_require__(43);
 
@@ -4633,11 +4625,9 @@ module.exports = canDefineProperty;
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  * 
@@ -4715,13 +4705,13 @@ module.exports = shallowEqual;
 
 
 var DOMLazyTree = __webpack_require__(16);
-var Danger = __webpack_require__(113);
+var Danger = __webpack_require__(111);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactInstrumentation = __webpack_require__(8);
 
 var createMicrosoftUnsafeLocalFunction = __webpack_require__(41);
 var setInnerHTML = __webpack_require__(30);
-var setTextContent = __webpack_require__(77);
+var setTextContent = __webpack_require__(75);
 
 function getNodeAfter(parentNode, node) {
   // Special case for text components, which return [open, close] comments
@@ -5261,8 +5251,8 @@ module.exports = KeyEscapeUtils;
 
 var _prodInvariant = __webpack_require__(3);
 
-var ReactPropTypesSecret = __webpack_require__(68);
-var propTypesFactory = __webpack_require__(52);
+var ReactPropTypesSecret = __webpack_require__(66);
+var propTypesFactory = __webpack_require__(53);
 
 var React = __webpack_require__(18);
 var PropTypes = propTypesFactory(React.isValidElement);
@@ -6483,22 +6473,23 @@ module.exports = lowPriorityWarning;
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
+
+
+module.exports = __webpack_require__(18);
+
+
+/***/ }),
+/* 50 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
 /* WEBPACK VAR INJECTION */(function(process) {
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
  *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- * http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -6569,17 +6560,15 @@ module.exports = EventListener;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 50 */
+/* 51 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
@@ -6601,7 +6590,7 @@ function focusNode(node) {
 module.exports = focusNode;
 
 /***/ }),
-/* 51 */
+/* 52 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6609,11 +6598,9 @@ module.exports = focusNode;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -6645,7 +6632,7 @@ function getActiveElement(doc) /*?DOMElement*/{
 module.exports = getActiveElement;
 
 /***/ }),
-/* 52 */
+/* 53 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6662,7 +6649,7 @@ module.exports = getActiveElement;
 // Therefore we re-export development-only version with all the PropTypes checks here.
 // However if one is migrating to the `prop-types` npm library, they will go through the
 // `index.js` entry point, and it will branch depending on the environment.
-var factory = __webpack_require__(106);
+var factory = __webpack_require__(104);
 module.exports = function(isValidElement) {
   // It is still allowed in 15.5.
   var throwOnDirectAccess = false;
@@ -6671,7 +6658,7 @@ module.exports = function(isValidElement) {
 
 
 /***/ }),
-/* 53 */
+/* 54 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -6690,178 +6677,7 @@ module.exports = ReactPropTypesSecret;
 
 
 /***/ }),
-/* 54 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- * 
- */
-
-function makeEmptyFunction(arg) {
-  return function () {
-    return arg;
-  };
-}
-
-/**
- * This function accepts and discards inputs; it has no side effects. This is
- * primarily useful idiomatically for overridable function endpoints which
- * always need to be callable, since JS lacks a null-call idiom ala Cocoa.
- */
-var emptyFunction = function emptyFunction() {};
-
-emptyFunction.thatReturns = makeEmptyFunction;
-emptyFunction.thatReturnsFalse = makeEmptyFunction(false);
-emptyFunction.thatReturnsTrue = makeEmptyFunction(true);
-emptyFunction.thatReturnsNull = makeEmptyFunction(null);
-emptyFunction.thatReturnsThis = function () {
-  return this;
-};
-emptyFunction.thatReturnsArgument = function (arg) {
-  return arg;
-};
-
-module.exports = emptyFunction;
-
-/***/ }),
 /* 55 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * Copyright (c) 2013-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-
-
-/**
- * Use invariant() to assert state which your program assumes to be true.
- *
- * Provide sprintf-style format (only %s is supported) and arguments
- * to provide information about what broke and what you were
- * expecting.
- *
- * The invariant message will be stripped in production, but the invariant
- * will remain to ensure logic does not differ in production.
- */
-
-var validateFormat = function validateFormat(format) {};
-
-if (process.env.NODE_ENV !== 'production') {
-  validateFormat = function validateFormat(format) {
-    if (format === undefined) {
-      throw new Error('invariant requires an error message argument');
-    }
-  };
-}
-
-function invariant(condition, format, a, b, c, d, e, f) {
-  validateFormat(format);
-
-  if (!condition) {
-    var error;
-    if (format === undefined) {
-      error = new Error('Minified exception occurred; use the non-minified dev environment ' + 'for the full error message and additional helpful warnings.');
-    } else {
-      var args = [a, b, c, d, e, f];
-      var argIndex = 0;
-      error = new Error(format.replace(/%s/g, function () {
-        return args[argIndex++];
-      }));
-      error.name = 'Invariant Violation';
-    }
-
-    error.framesToPop = 1; // we don't care about invariant's own frame
-    throw error;
-  }
-}
-
-module.exports = invariant;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 56 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-/* WEBPACK VAR INJECTION */(function(process) {/**
- * Copyright (c) 2014-present, Facebook, Inc.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
-
-
-
-var emptyFunction = __webpack_require__(54);
-
-/**
- * Similar to invariant but only logs a warning if the condition is not met.
- * This can be used to log issues in development environments in critical
- * paths. Removing the logging code for production environments will keep the
- * same logic and follow the same code paths.
- */
-
-var warning = emptyFunction;
-
-if (process.env.NODE_ENV !== 'production') {
-  var printWarning = function printWarning(format) {
-    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
-      args[_key - 1] = arguments[_key];
-    }
-
-    var argIndex = 0;
-    var message = 'Warning: ' + format.replace(/%s/g, function () {
-      return args[argIndex++];
-    });
-    if (typeof console !== 'undefined') {
-      console.error(message);
-    }
-    try {
-      // --- Welcome to debugging React ---
-      // This error was thrown as a convenience so that you can use this stack
-      // to find the callsite that caused this warning to fire.
-      throw new Error(message);
-    } catch (x) {}
-  };
-
-  warning = function warning(condition, format) {
-    if (format === undefined) {
-      throw new Error('`warning(condition, format, ...args)` requires a warning ' + 'message argument');
-    }
-
-    if (format.indexOf('Failed Composite propType: ') === 0) {
-      return; // Ignore CompositeComponent proptype check.
-    }
-
-    if (!condition) {
-      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
-        args[_key2 - 2] = arguments[_key2];
-      }
-
-      printWarning.apply(undefined, [format].concat(args));
-    }
-  };
-}
-
-module.exports = warning;
-/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
-
-/***/ }),
-/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7019,7 +6835,7 @@ var CSSProperty = {
 module.exports = CSSProperty;
 
 /***/ }),
-/* 58 */
+/* 56 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7142,7 +6958,7 @@ module.exports = PooledClass.addPoolingTo(CallbackQueue);
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 59 */
+/* 57 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7160,7 +6976,7 @@ var DOMProperty = __webpack_require__(13);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactInstrumentation = __webpack_require__(8);
 
-var quoteAttributeValueForBrowser = __webpack_require__(176);
+var quoteAttributeValueForBrowser = __webpack_require__(174);
 var warning = __webpack_require__(2);
 
 var VALID_ATTRIBUTE_NAME_REGEX = new RegExp('^[' + DOMProperty.ATTRIBUTE_NAME_START_CHAR + '][' + DOMProperty.ATTRIBUTE_NAME_CHAR + ']*$');
@@ -7381,7 +7197,7 @@ module.exports = DOMPropertyOperations;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 60 */
+/* 58 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7402,7 +7218,7 @@ var ReactDOMComponentFlags = {
 module.exports = ReactDOMComponentFlags;
 
 /***/ }),
-/* 61 */
+/* 59 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7606,7 +7422,7 @@ module.exports = ReactDOMSelect;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 62 */
+/* 60 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7639,7 +7455,7 @@ ReactEmptyComponent.injection = ReactEmptyComponentInjection;
 module.exports = ReactEmptyComponent;
 
 /***/ }),
-/* 63 */
+/* 61 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7664,7 +7480,7 @@ var ReactFeatureFlags = {
 module.exports = ReactFeatureFlags;
 
 /***/ }),
-/* 64 */
+/* 62 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7736,7 +7552,7 @@ module.exports = ReactHostComponent;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 65 */
+/* 63 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7750,11 +7566,11 @@ module.exports = ReactHostComponent;
 
 
 
-var ReactDOMSelection = __webpack_require__(131);
+var ReactDOMSelection = __webpack_require__(129);
 
-var containsNode = __webpack_require__(93);
-var focusNode = __webpack_require__(50);
-var getActiveElement = __webpack_require__(51);
+var containsNode = __webpack_require__(91);
+var focusNode = __webpack_require__(51);
+var getActiveElement = __webpack_require__(52);
 
 function isInDocument(node) {
   return containsNode(document.documentElement, node);
@@ -7862,7 +7678,7 @@ var ReactInputSelection = {
 module.exports = ReactInputSelection;
 
 /***/ }),
-/* 66 */
+/* 64 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -7884,18 +7700,18 @@ var React = __webpack_require__(18);
 var ReactBrowserEventEmitter = __webpack_require__(26);
 var ReactCurrentOwner = __webpack_require__(11);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactDOMContainerInfo = __webpack_require__(123);
-var ReactDOMFeatureFlags = __webpack_require__(125);
-var ReactFeatureFlags = __webpack_require__(63);
+var ReactDOMContainerInfo = __webpack_require__(121);
+var ReactDOMFeatureFlags = __webpack_require__(123);
+var ReactFeatureFlags = __webpack_require__(61);
 var ReactInstanceMap = __webpack_require__(22);
 var ReactInstrumentation = __webpack_require__(8);
-var ReactMarkupChecksum = __webpack_require__(145);
+var ReactMarkupChecksum = __webpack_require__(143);
 var ReactReconciler = __webpack_require__(17);
 var ReactUpdateQueue = __webpack_require__(40);
 var ReactUpdates = __webpack_require__(10);
 
 var emptyObject = __webpack_require__(24);
-var instantiateReactComponent = __webpack_require__(75);
+var instantiateReactComponent = __webpack_require__(73);
 var invariant = __webpack_require__(1);
 var setInnerHTML = __webpack_require__(30);
 var shouldUpdateReactComponent = __webpack_require__(46);
@@ -8404,7 +8220,7 @@ module.exports = ReactMount;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 67 */
+/* 65 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8448,7 +8264,7 @@ module.exports = ReactNodeTypes;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 68 */
+/* 66 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8468,7 +8284,7 @@ var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 module.exports = ReactPropTypesSecret;
 
 /***/ }),
-/* 69 */
+/* 67 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8496,7 +8312,7 @@ var ViewportMetrics = {
 module.exports = ViewportMetrics;
 
 /***/ }),
-/* 70 */
+/* 68 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8558,7 +8374,7 @@ module.exports = accumulateInto;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 71 */
+/* 69 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8592,7 +8408,7 @@ function forEachAccumulated(arr, cb, scope) {
 module.exports = forEachAccumulated;
 
 /***/ }),
-/* 72 */
+/* 70 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8606,7 +8422,7 @@ module.exports = forEachAccumulated;
 
 
 
-var ReactNodeTypes = __webpack_require__(67);
+var ReactNodeTypes = __webpack_require__(65);
 
 function getHostComponentFromComposite(inst) {
   var type;
@@ -8625,7 +8441,7 @@ function getHostComponentFromComposite(inst) {
 module.exports = getHostComponentFromComposite;
 
 /***/ }),
-/* 73 */
+/* 71 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8661,7 +8477,7 @@ function getTextContentAccessor() {
 module.exports = getTextContentAccessor;
 
 /***/ }),
-/* 74 */
+/* 72 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8787,7 +8603,7 @@ var inputValueTracking = {
 module.exports = inputValueTracking;
 
 /***/ }),
-/* 75 */
+/* 73 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8804,11 +8620,11 @@ module.exports = inputValueTracking;
 var _prodInvariant = __webpack_require__(3),
     _assign = __webpack_require__(4);
 
-var ReactCompositeComponent = __webpack_require__(120);
-var ReactEmptyComponent = __webpack_require__(62);
-var ReactHostComponent = __webpack_require__(64);
+var ReactCompositeComponent = __webpack_require__(118);
+var ReactEmptyComponent = __webpack_require__(60);
+var ReactHostComponent = __webpack_require__(62);
 
-var getNextDebugID = __webpack_require__(188);
+var getNextDebugID = __webpack_require__(189);
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
 
@@ -8920,7 +8736,7 @@ module.exports = instantiateReactComponent;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 76 */
+/* 74 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -8974,7 +8790,7 @@ function isTextInputElement(elem) {
 module.exports = isTextInputElement;
 
 /***/ }),
-/* 77 */
+/* 75 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9029,7 +8845,7 @@ if (ExecutionEnvironment.canUseDOM) {
 module.exports = setTextContent;
 
 /***/ }),
-/* 78 */
+/* 76 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9046,9 +8862,9 @@ module.exports = setTextContent;
 var _prodInvariant = __webpack_require__(3);
 
 var ReactCurrentOwner = __webpack_require__(11);
-var REACT_ELEMENT_TYPE = __webpack_require__(139);
+var REACT_ELEMENT_TYPE = __webpack_require__(137);
 
-var getIteratorFn = __webpack_require__(173);
+var getIteratorFn = __webpack_require__(171);
 var invariant = __webpack_require__(1);
 var KeyEscapeUtils = __webpack_require__(36);
 var warning = __webpack_require__(2);
@@ -9209,7 +9025,7 @@ module.exports = traverseAllChildren;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 79 */
+/* 77 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9226,7 +9042,7 @@ module.exports = traverseAllChildren;
 var _prodInvariant = __webpack_require__(19),
     _assign = __webpack_require__(4);
 
-var ReactNoopUpdateQueue = __webpack_require__(82);
+var ReactNoopUpdateQueue = __webpack_require__(80);
 
 var canDefineProperty = __webpack_require__(31);
 var emptyObject = __webpack_require__(24);
@@ -9356,7 +9172,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 80 */
+/* 78 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9379,7 +9195,7 @@ var REACT_ELEMENT_TYPE = typeof Symbol === 'function' && Symbol['for'] && Symbol
 module.exports = REACT_ELEMENT_TYPE;
 
 /***/ }),
-/* 81 */
+/* 79 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9404,10 +9220,10 @@ var ReactCurrentOwner = __webpack_require__(11);
 var ReactComponentTreeHook = __webpack_require__(7);
 var ReactElement = __webpack_require__(15);
 
-var checkReactTypeSpec = __webpack_require__(186);
+var checkReactTypeSpec = __webpack_require__(187);
 
 var canDefineProperty = __webpack_require__(31);
-var getIteratorFn = __webpack_require__(83);
+var getIteratorFn = __webpack_require__(81);
 var warning = __webpack_require__(2);
 var lowPriorityWarning = __webpack_require__(48);
 
@@ -9638,7 +9454,7 @@ module.exports = ReactElementValidator;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 82 */
+/* 80 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9737,7 +9553,7 @@ module.exports = ReactNoopUpdateQueue;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 83 */
+/* 81 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9781,42 +9597,32 @@ function getIteratorFn(maybeIterable) {
 module.exports = getIteratorFn;
 
 /***/ }),
-/* 84 */
+/* 82 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-module.exports = __webpack_require__(18);
-
-
-/***/ }),
-/* 85 */
-/***/ (function(module, exports, __webpack_require__) {
-
-"use strict";
-
-
-var _react = __webpack_require__(84);
+var _react = __webpack_require__(49);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _reactDom = __webpack_require__(107);
+var _reactDom = __webpack_require__(105);
 
 var _reactDom2 = _interopRequireDefault(_reactDom);
 
-var _App = __webpack_require__(86);
+var _App = __webpack_require__(83);
 
 var _App2 = _interopRequireDefault(_App);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
-__webpack_require__(193);
+__webpack_require__(194);
 
 _reactDom2.default.render(_react2.default.createElement(_App2.default, null), document.getElementById('react-root'));
 
 /***/ }),
-/* 86 */
+/* 83 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9828,11 +9634,15 @@ Object.defineProperty(exports, "__esModule", {
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
-var _react = __webpack_require__(84);
+var _react = __webpack_require__(49);
 
 var _react2 = _interopRequireDefault(_react);
 
-var _words = __webpack_require__(87);
+var _words = __webpack_require__(85);
+
+var _donate = __webpack_require__(84);
+
+var _donate2 = _interopRequireDefault(_donate);
 
 function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
 
@@ -9850,11 +9660,20 @@ var Word = function Word(_ref) {
         word
     );
 };
-var Instructions = function Instructions() {
+var WordsList = function WordsList(_ref2) {
+    var words = _ref2.words,
+        onClick = _ref2.onClick;
     return _react2.default.createElement(
         'div',
-        { className: 'instructions' },
-        '\u041F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u044F\u0439\u0442\u0435 \u043E\u0431\u0440\u0430\u0437 \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u0441\u043B\u043E\u0432\u0430 \u044F\u0440\u043A\u043E, \u0432 \u0446\u0432\u0435\u0442\u0435 \uD83C\uDF08. \u0421 \u043E\u0449\u0443\u0449\u0435\u043D\u0438\u044F\u043C\u0438 \u043F\u0440\u0438\u043A\u043E\u0441\u043D\u043E\u0432\u0435\u043D\u0438\u0439 \uD83D\uDC46, \u0437\u0432\u0443\u043A\u0430\u043C\u0438\uD83D\uDC42, \u0437\u0430\u043F\u0430\u0445\u0430\u043C\u0438\uD83D\uDC43, \u0430 \u0433\u0434\u0435 \u044D\u0442\u043E \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E - \u0438 \u0441\u043E \u0432\u043A\u0443\u0441\u043E\u043C \uD83D\uDC45. \u0415\u0441\u043B\u0438 \u044D\u0442\u043E\u0442 \u043D\u0430\u0431\u043E\u0440 \u0441\u043B\u043E\u0432 \u0443\u0436\u0435 \u0432\u0430\u043C \u0432\u0441\u0442\u0440\u0435\u0447\u0430\u043B\u0441\u044F \u2013 \u043F\u0440\u043E\u0441\u0442\u043E \u043F\u0435\u0440\u0435\u0437\u0430\u0433\u0440\u0443\u0437\u0438\u0442\u0435 \u0441\u0442\u0440\u0430\u043D\u0438\u0446\u0443'
+        { className: 'words-list', onClick: onClick },
+        words.map(function (word, i) {
+            return _react2.default.createElement(
+                'span',
+                null,
+                _react2.default.createElement(Word, { word: word }),
+                i !== words.length - 1 ? ', ' : '.'
+            );
+        })
     );
 };
 
@@ -9864,33 +9683,53 @@ var App = function (_Component) {
     function App() {
         _classCallCheck(this, App);
 
-        return _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).apply(this, arguments));
+        var _this = _possibleConstructorReturn(this, (App.__proto__ || Object.getPrototypeOf(App)).call(this));
+
+        _this.state = {
+            words: (0, _words.getWordsList)()
+        };
+        return _this;
     }
 
     _createClass(App, [{
+        key: 'changeWords',
+        value: function changeWords() {
+            this.setState({ words: (0, _words.getWordsList)() });
+        }
+    }, {
         key: 'render',
         value: function render() {
-            var words = (0, _words.getWordsList)();
+            var words = this.state.words;
+
+
             return _react2.default.createElement(
                 'div',
                 { className: 'app-wrapper' },
                 _react2.default.createElement(
-                    'h1',
-                    null,
-                    '\u0423\u043F\u0440\u0430\u0436\u043D\u0435\u043D\u0438\u0435 "\u041E\u0436\u0438\u0432\u043B\u0435\u043D\u0438\u0435 50 \u0441\u043B\u043E\u0432"'
+                    'div',
+                    { className: 'app-header' },
+                    _react2.default.createElement(
+                        'a',
+                        { target: '_blank', href: 'https://vk.com/talentcity1', className: 'gt-logo' },
+                        _react2.default.createElement('img', { alt: '\u0413\u043E\u0440\u043E\u0434 \u0442\u0430\u043B\u0430\u043D\u0442\u043E\u0432',
+                            src: 'https://pp.userapi.com/0eJL973_dcofGpT3Z20_gywRTmn45Y9NUaiXMg/kALatrZnCIs.jpg?ava=1' })
+                    ),
+                    _react2.default.createElement(
+                        'p',
+                        { className: 'app-header-text' },
+                        '\u041E\u0436\u0438\u0432\u043B\u0435\u043D\u0438\u0435 50\xA0\u0441\u043B\u043E\u0432'
+                    )
                 ),
-                _react2.default.createElement(Instructions, null),
                 _react2.default.createElement(
                     'div',
-                    { className: 'words-list' },
-                    words.map(function (word, i) {
-                        return _react2.default.createElement(
-                            'span',
-                            null,
-                            _react2.default.createElement(Word, { word: word }),
-                            i !== words.length - 1 ? ', ' : '.'
-                        );
-                    })
+                    { className: 'instructions' },
+                    '\u041F\u0440\u0435\u0434\u0441\u0442\u0430\u0432\u043B\u044F\u0439\u0442\u0435 \u043E\u0431\u0440\u0430\u0437 \u043A\u0430\u0436\u0434\u043E\u0433\u043E \u0441\u043B\u043E\u0432\u0430 \u044F\u0440\u043A\u043E, \u0432 \u0446\u0432\u0435\u0442\u0435 \uD83C\uDF08. \u0421 \u043E\u0449\u0443\u0449\u0435\u043D\u0438\u044F\u043C\u0438 \u043F\u0440\u0438\u043A\u043E\u0441\u043D\u043E\u0432\u0435\u043D\u0438\u0439 \uD83D\uDC46, \u0437\u0432\u0443\u043A\u0430\u043C\u0438\uD83D\uDC42, \u0437\u0430\u043F\u0430\u0445\u0430\u043C\u0438\uD83D\uDC43, \u0430 \u0433\u0434\u0435 \u044D\u0442\u043E \u0432\u043E\u0437\u043C\u043E\u0436\u043D\u043E - \u0438 \u0441\u043E \u0432\u043A\u0443\u0441\u043E\u043C \uD83D\uDC45. \u0415\u0441\u043B\u0438 \u044D\u0442\u043E\u0442 \u043D\u0430\u0431\u043E\u0440 \u0441\u043B\u043E\u0432 \u0443\u0436\u0435 \u0432\u0430\u043C \u0432\u0441\u0442\u0440\u0435\u0447\u0430\u043B\u0441\u044F \u2013 \u043F\u0440\u043E\u0441\u0442\u043E \u043D\u0430\u0436\u043C\u0438\u0442\u0435 \u043D\u0430 \u0441\u043F\u0438\u0441\u043E\u043A'
+                ),
+                _react2.default.createElement(WordsList, { words: words, onClick: this.changeWords.bind(this) }),
+                _react2.default.createElement(
+                    'div',
+                    { className: 'app-footer' },
+                    _react2.default.createElement(_donate2.default, null)
                 )
             );
         }
@@ -9902,7 +9741,7 @@ var App = function (_Component) {
 exports.default = App;
 
 /***/ }),
-/* 87 */
+/* 84 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -9911,15 +9750,93 @@ exports.default = App;
 Object.defineProperty(exports, "__esModule", {
     value: true
 });
-var WORDS_DB = [['Кошка', 'дом', 'машина', 'яблоко', 'шкаф', 'река', 'карандаш', 'телефон', 'рубашка', 'бумага', 'трава', 'краска', 'шуба', 'сыр', 'стакан', 'лейка', 'газета', 'гвоздика', 'мороженое', 'ковш', 'гвоздь', 'хлеб', 'пианино', 'зеркало', 'медведь', 'компьютер', 'лампа', 'ящик', 'батон', 'вилка', 'газон', 'дорога', 'ежик', 'замок', 'иголка', 'капля', 'рисунок', 'свисток', 'туфли', 'ухо', 'фонарь', 'хвост', 'цапля', 'чучело', 'шампур', 'щука', 'экран', 'юла', 'янтарь', 'ананас'], ['Арбалет', 'бровь', 'вишня', 'гитара', 'доска', 'ель', 'жвачка', 'звонок', 'искры', 'клетка', 'лебедь', 'молоко', 'ноготь', 'опилки', 'поросенок', 'розетка', 'стул', 'тумбочка', 'угольник', 'фисташки', 'хлыст', 'цистерна', 'чердак', 'шлейф', 'щетка', 'якорь', 'апельсин', 'будильник', 'вентилятор', 'грибы', 'дыня', 'енот', 'жаркое', 'зима', 'иней', 'косметика', 'лимон', 'мед', 'носилки', 'океан', 'пирог', 'резинка', 'стебель', 'труба', 'урна', 'фантики', 'хлопушки', 'циркуль', 'червяк', 'шляпа'], ['Ястреб', 'Африка', 'белка', 'войлок', 'грабли', 'дождь', 'зелень', 'индекс', 'клавиатура', 'линолеум', 'муха', 'носки', 'облако', 'простыня', 'ремень', 'стол', 'турник', 'уж', 'фонтан', 'хворост', 'центрифуга', 'чернила', 'шайба', 'щетина', 'электробритва', 'юг', 'язь', 'астра', 'борщ', 'вата', 'гармонь', 'дихлофос', 'ельник', 'жаба', 'запеканка', 'ил', 'квартира', 'лыжи', 'манка', 'нос', 'окорочек', 'кислота', 'липучка', 'мельница', 'нарзан', 'окно', 'питарда', 'радуга', 'скрепка', 'танк'], ['Кефир', 'кот', 'машина', 'телефон', 'книга', 'клей', 'диван', 'ложка', 'микроскоп', 'жаворонок', 'антенна', 'шкаф', 'рука', 'печь', 'ковер', 'носок', 'гитара', 'карандаш', 'открытка', 'диск', 'часы', 'дом', 'обои', 'ручей', 'мышь', 'монета', 'платок', 'веер', 'душ', 'лампа', 'пенал', 'восток', 'рама', 'кружево', 'желудь', 'фата', 'сосна', 'скотч', 'музыка', 'ночь', 'пир', 'чай', 'калина', 'замок', 'море', 'меч', 'рысь', 'фонтан', 'тюльпан', 'дождь'], ['Открытка', 'зонт', 'спички', 'мармелад', 'гусь', 'роза', 'камень', 'галька', 'песок', 'малина', 'фонтан', 'картон', 'земляника', 'трико', 'брошь', 'холодильник', 'утюг', 'свитер', 'колесо', 'журнал', 'овес', 'липа', 'зажигалка', 'асфальт', 'снежинка', 'желток', 'ворона', 'опилки', 'штукатурка', 'аккордеон', 'галстук', 'водопад', 'сырок', 'перо', 'ящик', 'юбка', 'электромотор', 'цистерна', 'чек', 'дог', 'сосулька', 'пирог', 'монета', 'гравий', 'пух', 'метла', 'вьюга', 'скважина', 'конверт', 'прибой'], ['Плеер', 'флаер', 'веер', 'фермер', 'цербер', 'сумка', 'Умка', 'краска', 'ласка', 'каска', 'замазка', 'опушка', 'подушка', 'вьюшка', 'жижа', 'картошка', 'морошка', 'бомбошка', 'хрюшка', 'пушка', 'дрожжи', 'вожжи', 'моржи', 'бигуди', 'сапоги', 'тушенка', 'сгущенка', 'мочалка', 'качалка', 'простыня', 'болтовня', 'ребятня', 'зажим', 'уж', 'муж', 'душ', 'тушь', 'мышь', 'пылишь', 'молчишь', 'собака', 'аптека', 'патока', 'шнурки', 'тесьма', 'батончик', 'лед', 'укроп', 'фанфары', 'вино'], ['Косынка', 'лезгинка', 'брусника', 'мороз', 'мох', 'окно', 'чайка', 'балалайка', 'лейка', 'гусли', 'бабочка', 'коса', 'полынья', 'пшеница', 'пляж', 'Антарктида', 'гриб', 'плащ', 'жесть', 'слива', 'гиря', 'пинцет', 'билет', 'ответ', 'бланк', 'танк', 'кора', 'дыра', 'озеро', 'кисель', 'цапля', 'творог', 'берег', 'газон', 'скала', 'сосна', 'стихи', 'васильки', 'пузыри', 'фонари', 'крошки', 'мошки', 'сережки', 'матрешки', 'скотч', 'кнопка', 'помидор', 'клей', 'молоток', 'обои'], ['Зверь', 'камера', 'сметана', 'тент', 'пончики', 'крупа', 'коньки', 'роса', 'расческа', 'шарик', 'ремень', 'шкатулка', 'газ', 'салат', 'фотоаппарат', 'варежки', 'шорты', 'подвеска', 'блокнот', 'сосна', 'одеяло', 'гравий', 'вензель', 'ножницы', 'визитка', 'мел', 'подоконник', 'черешня', 'рубин', 'файл', 'авоська', 'бронза', 'сардельки', 'дудочка', 'сандалии', 'поцелуй', 'ворона', 'перекладина', 'блузка', 'снежок', 'воротник', 'бублик', 'жмурки', 'дятел', 'керосин', 'обложка', 'пуговица', 'клей', 'мука', 'журнал'], ['Нос', 'полка', 'розетка', 'утки', 'интервью', 'кисточка', 'освещение', 'балалайка', 'орган', 'пояс', 'бусы', 'пыль', 'пух', 'кепка', 'палисадник', 'полог', 'кресло', 'вафли', 'снегирь', 'факел', 'гладиолус', 'станок', 'качалка', 'шампунь', 'алюминий', 'азарт', 'косточки', 'калоши', 'барбос', 'колготки', 'Барби', 'фундук', 'серьга', 'карман', 'запонка', 'бегемот', 'ландыш', 'одеколон', 'крышка', 'стрела', 'линейка', 'пудинг', 'шампанское', 'шифер', 'вилка', 'цилиндр', 'струна', 'сатин', 'клюква', 'кашпо'], ['Арбуз', 'бабуин', 'жаворонок', 'батут', 'шинель', 'шлепанцы', 'якорь', 'грузовик', 'дюймовочка', 'плюшки', 'кружева', 'заяц', 'рукав', 'провод', 'спицы', 'картофель', 'почерк', 'батарейки', 'кувшин', 'свекла', 'чайка', 'олень', 'проталина', 'липки', 'стручки', 'золото', 'жернов', 'береста', 'ноготь', 'лодка', 'зал', 'штурвал', 'черника', 'ангар', 'спецовка', 'черешня', 'контакты', 'щит', 'крыло', 'угол', 'пижама', 'фаэтон', 'цифра', 'ядра', 'пергамент', 'винт', 'ярлык', 'шимпанзе', 'презентация', 'хлеб'], ['Дыня', 'скипидар', 'елка', 'занозы', 'емкость', 'установка', 'график', 'спокойствие', 'винт', 'хвостик', 'глазунья', 'ежик', 'тюльпан', 'рябина', 'складки', 'пурга', 'гимназия', 'доклад', 'рассада', 'пар', 'охапка', 'канат', 'лыжи', 'аккордеон', 'игуана', 'ковер', 'пакетик', 'косичка', 'батон', 'молния', 'иней', 'игрушка', 'понтон', 'ствол', 'гайка', 'обшлаг', 'дуршлаг', 'шлак', 'сталь', 'полировка', 'стекло', 'люстра', 'симпатия', 'гараж', 'надпись', 'записка', 'брызговик', 'бретелька', 'брелок', 'бур'], ['Абрикос', 'баран', 'шепот', 'фиалки', 'жаркое', 'осина', 'парус', 'флюгер', 'маска', 'порошок', 'валик', 'текстура', 'ролики', 'кнопка', 'корзина', 'какаду', 'пресс', 'ревень', 'шкив', 'серебро', 'надпись', 'закваска', 'полоса', 'пашня', 'жучок', 'страус', 'отражение', 'изображение', 'бродить', 'бег', 'купальник', 'крюк', 'крестик', 'литавры', 'очистки', 'сокол', 'заклепка', 'клипсы', 'леденец', 'двигатель', 'крыжовник', 'оса', 'водопровод', 'Крайслер', 'крейсер', 'аромат', 'мята', 'мак', 'каюта', 'пляска'], ['Финики', 'сковорода', 'берег', 'комар', 'табурет', 'пингвин', 'папуас', 'диктант', 'совещание', 'спуск', 'лифт', 'ступенька', 'гильза', 'липа', 'тряска', 'морось', 'морковь', 'болото', 'аэростат', 'ртуть', 'циферблат', 'ремешок', 'форма', 'палочка', 'палатка', 'клюв', 'дым', 'фрегат', 'бассейн', 'индейка', 'глобус', 'медведь', 'монета', 'доклад', 'черемуха', 'эмаль', 'бант', 'сетка', 'жесть', 'морозильник', 'плазма', 'буй', 'искры', 'Сибирь', 'селедка', 'процессор', 'виноград', 'носки', 'озон', 'рожь'], ['Перчатки', 'планшет', 'родник', 'тень', 'павильон', 'рысь', 'воск', 'зебра', 'небоскреб', 'метро', 'брови', 'сирень', 'сок', 'гранат', 'свеча', 'сало', 'сундук', 'скрепка', 'саквояж', 'подушка', 'олень', 'хризантемы', 'кожа', 'мизинец', 'значок', 'опахало', 'кастрюля', 'каска', 'Австралия', 'ледник', 'пустыня', 'погреб', 'блокнот', 'репа', 'сказка', 'пододеяльник', 'галстук', 'родинка', 'брызги', 'брезент', 'радио', 'сверло', 'морзянка', 'флажок', 'эмблема', 'наклейка', 'булыжник', 'корова', 'двор', 'зерно', 'солома'], ['Масленица', 'лук', 'каток', 'катушка', 'лягушка', 'спинка', 'кедр', 'незабудки', 'лев', 'муха', 'Франция', 'дельтаплан', 'звезда', 'снимки', 'график', 'зачет', 'пазлы', 'престиж', 'навес', 'нора', 'ниша', 'Саша', 'бокс', 'табель', 'гонг', 'ванты', 'курага', 'грачи', 'бутон', 'бриз', 'свинец', 'шелк', 'овчарка', 'градусник', 'орден', 'гроза', 'слеза', 'сон', 'сопло', 'лопата', 'табло', 'лото', 'торт', 'рот', 'открытка', 'камбуз', 'бузина', 'настойка', 'кафель', 'ельник'], ['Икра', 'раки', 'кишмиш', 'мешок', 'шоколад', 'ладья', 'дьякон', 'консервы', 'вышка', 'шкаф', 'авиатор', 'торговля', 'лялька', 'кафетерий', 'рис', 'источник', 'икона', 'набат', 'баттерфляй', 'фляга', 'горизонт', 'тополь', 'каллы', 'лыжня', 'няня', 'сухари', 'рисунок', 'колени', 'восхождение', 'резак', 'вершина', 'намазывать', 'класть', 'мед', 'чай', 'рюкзак', 'салфетки', 'зажигалка', 'пятак', 'флейта', 'орел', 'шпингалет', 'фараон', 'глина', 'дробь', 'горох', 'потоп', 'пристань', 'замок', 'щука'], ['Аквариум', 'пулемет', 'семечки', 'пламя', 'заколка', 'туя', 'футболка', 'герань', 'покрывало', 'сенбернар', 'седло', 'абажур', 'ложечка', 'нитка', 'рельс', 'просо', 'сом', 'Омск', 'Скандинавия', 'оса', 'электричка', 'граница', 'сабля', 'лазер', 'платина', 'жемчуг', 'тротуар', 'прыжки', 'кисель', 'грабли', 'вымпел', 'хобот', 'порох', 'этикет', 'сбор', 'сброд', 'брод', 'родня', 'тропа', 'папаха', 'казна', 'пудра', 'драп', 'репей', 'лейка', 'копейка', 'волынка', 'лунка', 'луна', 'унты'], ['Фея', 'тюль', 'бечевка', 'фата', 'проспект', 'шпиль', 'авто', 'вокзал', 'полки', 'рупор', 'ожидание', 'давка', 'Антарктида', 'тюлень', 'Арктика', 'морж', 'коктейль', 'моряк', 'капитан', 'трап', 'пальма', 'одуванчик', 'стрекоза', 'камыши', 'ракушка', 'ил', 'ива', 'погоны', 'спираль', 'перелет', 'реклама', 'жара', 'ресторан', 'холод', 'шуба', 'очки', 'баллончик', 'балкон', 'кокон', 'локон', 'попкорн', 'поп', 'пуп', 'какао', 'сгущенка', 'влияние', 'прохлада', 'эстакада', 'драгоценности', 'дрова'], ['Банан', 'крапива', 'известка', 'обои', 'тамтам', 'лайка', 'выдержка', 'физика', 'оборот', 'чечетка', 'позвоночник', 'звоночек', 'смола', 'соль', 'кузнечик', 'дуб', 'Италия', 'абзац', 'продолжение', 'миксер', 'штопор', 'коробок', 'бок', 'лицо', 'когти', 'клавиши', 'вишни', 'штопка', 'стопка', 'папка', 'степ', 'мозоль', 'молот', 'томат', 'винт', 'игрушка', 'шашки', 'ушанка', 'шепот', 'обложка', 'куст', 'тюбик', 'калач', 'бирка', 'кит', 'мачта', 'волны', 'овраг', 'рога', 'капуста'], ['Земляника', 'туман', 'зелень', 'свет', 'механизм', 'борщ', 'футбол', 'град', 'колесо', 'поворот', 'лопата', 'раздумье', 'редиска', 'облик', 'зеркальце', 'ручка', 'напряжение', 'контейнер', 'гора', 'шайба', 'багаж', 'гиря', 'душ', 'шляпа', 'клен', 'свитер', 'газ', 'осмотр', 'переход', 'свист', 'деталь', 'взгляд', 'редкость', 'картинка', 'нитка', 'украшение', 'обвал', 'разоблачение', 'вид', 'полет', 'россыпь', 'вращение', 'левша', 'проход', 'гомон', 'крошки', 'ватин', 'замазка', 'стекло', 'область'], ['Грядка', 'дудочка', 'морс', 'ворс', 'расчет', 'сажа', 'слива', 'пространство', 'разговор', 'чертеж', 'экзамен', 'обмен', 'икота', 'забота', 'тапочек', 'ветки', 'синица', 'дыхание', 'работа', 'объем', 'примерка', 'белизна', 'весна', 'пощечина', 'поцелуй', 'ось', 'вибрация', 'заземление', 'включение', 'ток', 'клюв', 'колено', 'Гренландия', 'семена', 'трап', 'цифра', 'обувь', 'плечо', 'чай', 'кадр', 'беседа', 'мгновение', 'турнир', 'шеф', 'дебет', 'энергия', 'кран', 'форма', 'клиент', 'глазок']];
 
-var getWordsList = exports.getWordsList = function getWordsList() {
-    return WORDS_DB[Math.floor(Math.random() * WORDS_DB.length)];
+var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
+
+var _react = __webpack_require__(49);
+
+var _react2 = _interopRequireDefault(_react);
+
+function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
+
+function _classCallCheck(instance, Constructor) { if (!(instance instanceof Constructor)) { throw new TypeError("Cannot call a class as a function"); } }
+
+function _possibleConstructorReturn(self, call) { if (!self) { throw new ReferenceError("this hasn't been initialised - super() hasn't been called"); } return call && (typeof call === "object" || typeof call === "function") ? call : self; }
+
+function _inherits(subClass, superClass) { if (typeof superClass !== "function" && superClass !== null) { throw new TypeError("Super expression must either be null or a function, not " + typeof superClass); } subClass.prototype = Object.create(superClass && superClass.prototype, { constructor: { value: subClass, enumerable: false, writable: true, configurable: true } }); if (superClass) Object.setPrototypeOf ? Object.setPrototypeOf(subClass, superClass) : subClass.__proto__ = superClass; }
+
+var Donation = function (_Component) {
+    _inherits(Donation, _Component);
+
+    function Donation(props) {
+        _classCallCheck(this, Donation);
+
+        var _this = _possibleConstructorReturn(this, (Donation.__proto__ || Object.getPrototypeOf(Donation)).call(this, props));
+
+        _this.state = { formVisibility: false };
+        return _this;
+    }
+
+    _createClass(Donation, [{
+        key: "toggleForm",
+        value: function toggleForm() {
+            this.setState({ formVisibility: !this.state.formVisibility });
+        }
+    }, {
+        key: "render",
+        value: function render() {
+            var formVisibility = this.state.formVisibility;
+
+
+            return _react2.default.createElement(
+                "div",
+                { className: "donation-wrapper" },
+                _react2.default.createElement(
+                    "div",
+                    { className: "donation-button", onClick: this.toggleForm.bind(this) },
+                    "\uD83D\uDC4D \u041F\u043E\u0434\u0434\u0435\u0440\u0436\u0430\u0442\u044C \u0440\u0430\u0437\u0440\u0430\u0431\u043E\u0442\u0447\u0438\u043A\u0430"
+                ),
+                _react2.default.createElement(
+                    "div",
+                    { className: "donation-form", style: { display: formVisibility ? 'block' : 'none' } },
+                    _react2.default.createElement("iframe", {
+                        src: "https://money.yandex.ru/quickpay/shop-widget?writer=seller&targets=%D0%9D%D0%B0%20%D1%80%D0%B0%D0%B7%D0%B2%D0%B8%D1%82%D0%B8%D0%B5%20%D1%83%D0%BF%D1%80%D0%B0%D0%B6%D0%BD%D0%B5%D0%BD%D0%B8%D0%B9&targets-hint=&default-sum=200&button-text=14&hint=&successURL=&quickpay=shop&account=4100110480715715",
+                        width: "300", height: "224", frameBorder: "0", allowTransparency: "true", scrolling: "no" })
+                )
+            );
+        }
+    }]);
+
+    return Donation;
+}(_react.Component);
+
+exports.default = Donation;
+
+/***/ }),
+/* 85 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+
+
+Object.defineProperty(exports, "__esModule", {
+    value: true
+});
+var WORDS_DB = [['Кошка', 'дом', 'машина', 'яблоко', 'шкаф', 'река', 'карандаш', 'телефон', 'рубашка', 'бумага', 'трава', 'краска', 'шуба', 'сыр', 'стакан', 'лейка', 'газета', 'гвоздика', 'мороженое', 'ковш', 'гвоздь', 'хлеб', 'пианино', 'зеркало', 'медведь', 'компьютер', 'лампа', 'ящик', 'батон', 'вилка', 'газон', 'дорога', 'ежик', 'замок', 'иголка', 'капля', 'рисунок', 'свисток', 'туфли', 'ухо', 'фонарь', 'хвост', 'цапля', 'чучело', 'шампур', 'щука', 'экран', 'юла', 'янтарь', 'ананас'], ['Арбалет', 'бровь', 'вишня', 'гитара', 'доска', 'ель', 'жвачка', 'звонок', 'искры', 'клетка', 'лебедь', 'молоко', 'ноготь', 'опилки', 'поросенок', 'розетка', 'стул', 'тумбочка', 'угольник', 'фисташки', 'хлыст', 'цистерна', 'чердак', 'шлейф', 'щетка', 'якорь', 'апельсин', 'будильник', 'вентилятор', 'грибы', 'дыня', 'енот', 'жаркое', 'зима', 'иней', 'косметика', 'лимон', 'мед', 'носилки', 'океан', 'пирог', 'резинка', 'стебель', 'труба', 'урна', 'фантики', 'хлопушки', 'циркуль', 'червяк', 'шляпа'], ['Ястреб', 'Африка', 'белка', 'войлок', 'грабли', 'дождь', 'зелень', 'индекс', 'клавиатура', 'линолеум', 'муха', 'носки', 'облако', 'простыня', 'ремень', 'стол', 'турник', 'уж', 'фонтан', 'хворост', 'центрифуга', 'чернила', 'шайба', 'щетина', 'электробритва', 'юг', 'язь', 'астра', 'борщ', 'вата', 'гармонь', 'дихлофос', 'ельник', 'жаба', 'запеканка', 'ил', 'квартира', 'лыжи', 'манка', 'нос', 'окорочек', 'кислота', 'липучка', 'мельница', 'нарзан', 'окно', 'питарда', 'радуга', 'скрепка', 'танк'], ['Кефир', 'кот', 'машина', 'телефон', 'книга', 'клей', 'диван', 'ложка', 'микроскоп', 'жаворонок', 'антенна', 'шкаф', 'рука', 'печь', 'ковер', 'носок', 'гитара', 'карандаш', 'открытка', 'диск', 'часы', 'дом', 'обои', 'ручей', 'мышь', 'монета', 'платок', 'веер', 'душ', 'лампа', 'пенал', 'восток', 'рама', 'кружево', 'желудь', 'фата', 'сосна', 'скотч', 'музыка', 'ночь', 'пир', 'чай', 'калина', 'замок', 'море', 'меч', 'рысь', 'фонтан', 'тюльпан', 'дождь'], ['Открытка', 'зонт', 'спички', 'мармелад', 'гусь', 'роза', 'камень', 'галька', 'песок', 'малина', 'фонтан', 'картон', 'земляника', 'трико', 'брошь', 'холодильник', 'утюг', 'свитер', 'колесо', 'журнал', 'овес', 'липа', 'зажигалка', 'асфальт', 'снежинка', 'желток', 'ворона', 'опилки', 'штукатурка', 'аккордеон', 'галстук', 'водопад', 'сырок', 'перо', 'ящик', 'юбка', 'электромотор', 'цистерна', 'чек', 'дог', 'сосулька', 'пирог', 'монета', 'гравий', 'пух', 'метла', 'вьюга', 'скважина', 'конверт', 'прибой'], ['Плеер', 'флаер', 'веер', 'фермер', 'цербер', 'сумка', 'Умка', 'краска', 'ласка', 'каска', 'замазка', 'опушка', 'подушка', 'вьюшка', 'жижа', 'картошка', 'морошка', 'бомбошка', 'хрюшка', 'пушка', 'дрожжи', 'вожжи', 'моржи', 'бигуди', 'сапоги', 'тушенка', 'сгущенка', 'мочалка', 'качалка', 'простыня', 'болтовня', 'ребятня', 'зажим', 'уж', 'муж', 'душ', 'тушь', 'мышь', 'пылишь', 'молчишь', 'собака', 'аптека', 'патока', 'шнурки', 'тесьма', 'батончик', 'лед', 'укроп', 'фанфары', 'вино'], ['Косынка', 'лезгинка', 'брусника', 'мороз', 'мох', 'окно', 'чайка', 'балалайка', 'лейка', 'гусли', 'бабочка', 'коса', 'полынья', 'пшеница', 'пляж', 'Антарктида', 'гриб', 'плащ', 'жесть', 'слива', 'гиря', 'пинцет', 'билет', 'ответ', 'бланк', 'танк', 'кора', 'дыра', 'озеро', 'кисель', 'цапля', 'творог', 'берег', 'газон', 'скала', 'сосна', 'стихи', 'васильки', 'пузыри', 'фонари', 'крошки', 'мошки', 'сережки', 'матрешки', 'скотч', 'кнопка', 'помидор', 'клей', 'молоток', 'обои'], ['Зверь', 'камера', 'сметана', 'тент', 'пончики', 'крупа', 'коньки', 'роса', 'расческа', 'шарик', 'ремень', 'шкатулка', 'газ', 'салат', 'фотоаппарат', 'варежки', 'шорты', 'подвеска', 'блокнот', 'сосна', 'одеяло', 'гравий', 'вензель', 'ножницы', 'визитка', 'мел', 'подоконник', 'черешня', 'рубин', 'файл', 'авоська', 'бронза', 'сардельки', 'дудочка', 'сандалии', 'поцелуй', 'ворона', 'перекладина', 'блузка', 'снежок', 'воротник', 'бублик', 'жмурки', 'дятел', 'керосин', 'обложка', 'пуговица', 'клей', 'мука', 'журнал'], ['Нос', 'полка', 'розетка', 'утки', 'интервью', 'кисточка', 'освещение', 'балалайка', 'орган', 'пояс', 'бусы', 'пыль', 'пух', 'кепка', 'палисадник', 'полог', 'кресло', 'вафли', 'снегирь', 'факел', 'гладиолус', 'станок', 'качалка', 'шампунь', 'алюминий', 'азарт', 'косточки', 'калоши', 'барбос', 'колготки', 'Барби', 'фундук', 'серьга', 'карман', 'запонка', 'бегемот', 'ландыш', 'одеколон', 'крышка', 'стрела', 'линейка', 'пудинг', 'шампанское', 'шифер', 'вилка', 'цилиндр', 'струна', 'сатин', 'клюква', 'кашпо'], ['Арбуз', 'бабуин', 'жаворонок', 'батут', 'шинель', 'шлепанцы', 'якорь', 'грузовик', 'дюймовочка', 'плюшки', 'кружева', 'заяц', 'рукав', 'провод', 'спицы', 'картофель', 'почерк', 'батарейки', 'кувшин', 'свекла', 'чайка', 'олень', 'проталина', 'липки', 'стручки', 'золото', 'жернов', 'береста', 'ноготь', 'лодка', 'зал', 'штурвал', 'черника', 'ангар', 'спецовка', 'черешня', 'контакты', 'щит', 'крыло', 'угол', 'пижама', 'фаэтон', 'цифра', 'ядра', 'пергамент', 'винт', 'ярлык', 'шимпанзе', 'презентация', 'хлеб'], ['Дыня', 'скипидар', 'елка', 'занозы', 'емкость', 'установка', 'график', 'спокойствие', 'винт', 'хвостик', 'глазунья', 'ежик', 'тюльпан', 'рябина', 'складки', 'пурга', 'гимназия', 'доклад', 'рассада', 'пар', 'охапка', 'канат', 'лыжи', 'аккордеон', 'игуана', 'ковер', 'пакетик', 'косичка', 'батон', 'молния', 'иней', 'игрушка', 'понтон', 'ствол', 'гайка', 'обшлаг', 'дуршлаг', 'шлак', 'сталь', 'полировка', 'стекло', 'люстра', 'симпатия', 'гараж', 'надпись', 'записка', 'брызговик', 'бретелька', 'брелок', 'бур'], ['Абрикос', 'баран', 'шепот', 'фиалки', 'жаркое', 'осина', 'парус', 'флюгер', 'маска', 'порошок', 'валик', 'текстура', 'ролики', 'кнопка', 'корзина', 'какаду', 'пресс', 'ревень', 'шкив', 'серебро', 'надпись', 'закваска', 'полоса', 'пашня', 'жучок', 'страус', 'отражение', 'изображение', 'бродить', 'бег', 'купальник', 'крюк', 'крестик', 'литавры', 'очистки', 'сокол', 'заклепка', 'клипсы', 'леденец', 'двигатель', 'крыжовник', 'оса', 'водопровод', 'Крайслер', 'крейсер', 'аромат', 'мята', 'мак', 'каюта', 'пляска'], ['Финики', 'сковорода', 'берег', 'комар', 'табурет', 'пингвин', 'папуас', 'диктант', 'совещание', 'спуск', 'лифт', 'ступенька', 'гильза', 'липа', 'тряска', 'морось', 'морковь', 'болото', 'аэростат', 'ртуть', 'циферблат', 'ремешок', 'форма', 'палочка', 'палатка', 'клюв', 'дым', 'фрегат', 'бассейн', 'индейка', 'глобус', 'медведь', 'монета', 'доклад', 'черемуха', 'эмаль', 'бант', 'сетка', 'жесть', 'морозильник', 'плазма', 'буй', 'искры', 'Сибирь', 'селедка', 'процессор', 'виноград', 'носки', 'озон', 'рожь'], ['Перчатки', 'планшет', 'родник', 'тень', 'павильон', 'рысь', 'воск', 'зебра', 'небоскреб', 'метро', 'брови', 'сирень', 'сок', 'гранат', 'свеча', 'сало', 'сундук', 'скрепка', 'саквояж', 'подушка', 'олень', 'хризантемы', 'кожа', 'мизинец', 'значок', 'опахало', 'кастрюля', 'каска', 'Австралия', 'ледник', 'пустыня', 'погреб', 'блокнот', 'репа', 'сказка', 'пододеяльник', 'галстук', 'родинка', 'брызги', 'брезент', 'радио', 'сверло', 'морзянка', 'флажок', 'эмблема', 'наклейка', 'булыжник', 'корова', 'двор', 'зерно', 'солома'], ['Масленица', 'лук', 'каток', 'катушка', 'лягушка', 'спинка', 'кедр', 'незабудки', 'лев', 'муха', 'Франция', 'дельтаплан', 'звезда', 'снимки', 'график', 'зачет', 'пазлы', 'престиж', 'навес', 'нора', 'ниша', 'Саша', 'бокс', 'табель', 'гонг', 'ванты', 'курага', 'грачи', 'бутон', 'бриз', 'свинец', 'шелк', 'овчарка', 'градусник', 'орден', 'гроза', 'слеза', 'сон', 'сопло', 'лопата', 'табло', 'лото', 'торт', 'рот', 'открытка', 'камбуз', 'бузина', 'настойка', 'кафель', 'ельник'], ['Икра', 'раки', 'кишмиш', 'мешок', 'шоколад', 'ладья', 'дьякон', 'консервы', 'вышка', 'шкаф', 'авиатор', 'торговля', 'лялька', 'кафетерий', 'рис', 'источник', 'икона', 'набат', 'баттерфляй', 'фляга', 'горизонт', 'тополь', 'каллы', 'лыжня', 'няня', 'сухари', 'рисунок', 'колени', 'восхождение', 'резак', 'вершина', 'намазывать', 'класть', 'мед', 'чай', 'рюкзак', 'салфетки', 'зажигалка', 'пятак', 'флейта', 'орел', 'шпингалет', 'фараон', 'глина', 'дробь', 'горох', 'потоп', 'пристань', 'замок', 'щука'], ['Аквариум', 'пулемет', 'семечки', 'пламя', 'заколка', 'туя', 'футболка', 'герань', 'покрывало', 'сенбернар', 'седло', 'абажур', 'ложечка', 'нитка', 'рельс', 'просо', 'сом', 'Омск', 'Скандинавия', 'оса', 'электричка', 'граница', 'сабля', 'лазер', 'платина', 'жемчуг', 'тротуар', 'прыжки', 'кисель', 'грабли', 'вымпел', 'хобот', 'порох', 'этикет', 'сбор', 'сброд', 'брод', 'родня', 'тропа', 'папаха', 'казна', 'пудра', 'драп', 'репей', 'лейка', 'копейка', 'волынка', 'лунка', 'луна', 'унты'], ['Фея', 'тюль', 'бечевка', 'фата', 'проспект', 'шпиль', 'авто', 'вокзал', 'полки', 'рупор', 'ожидание', 'давка', 'Антарктида', 'тюлень', 'Арктика', 'морж', 'коктейль', 'моряк', 'капитан', 'трап', 'пальма', 'одуванчик', 'стрекоза', 'камыши', 'ракушка', 'ил', 'ива', 'погоны', 'спираль', 'перелет', 'реклама', 'жара', 'ресторан', 'холод', 'шуба', 'очки', 'баллончик', 'балкон', 'кокон', 'локон', 'попкорн', 'поп', 'пуп', 'какао', 'сгущенка', 'влияние', 'прохлада', 'эстакада', 'драгоценности', 'дрова'], ['Банан', 'крапива', 'известка', 'обои', 'тамтам', 'лайка', 'выдержка', 'физика', 'оборот', 'чечетка', 'позвоночник', 'звоночек', 'смола', 'соль', 'кузнечик', 'дуб', 'Италия', 'абзац', 'продолжение', 'миксер', 'штопор', 'коробок', 'бок', 'лицо', 'когти', 'клавиши', 'вишни', 'штопка', 'стопка', 'папка', 'степ', 'мозоль', 'молот', 'томат', 'винт', 'игрушка', 'шашки', 'ушанка', 'шепот', 'обложка', 'куст', 'тюбик', 'калач', 'бирка', 'кит', 'мачта', 'волны', 'овраг', 'рога', 'капуста'], ['Земляника', 'туман', 'зелень', 'свет', 'механизм', 'борщ', 'футбол', 'град', 'колесо', 'поворот', 'лопата', 'раздумье', 'редиска', 'облик', 'зеркальце', 'ручка', 'напряжение', 'контейнер', 'гора', 'шайба', 'багаж', 'гиря', 'душ', 'шляпа', 'клен', 'свитер', 'газ', 'осмотр', 'переход', 'свист', 'деталь', 'взгляд', 'редкость', 'картинка', 'нитка', 'украшение', 'обвал', 'разоблачение', 'вид', 'полет', 'россыпь', 'вращение', 'левша', 'проход', 'гомон', 'крошки', 'ватин', 'замазка', 'стекло', 'область'], ['Грядка', 'дудочка', 'морс', 'ворс', 'расчет', 'сажа', 'слива', 'пространство', 'разговор', 'чертеж', 'экзамен', 'обмен', 'икота', 'забота', 'тапочек', 'ветки', 'синица', 'дыхание', 'работа', 'объем', 'примерка', 'белизна', 'весна', 'пощечина', 'поцелуй', 'ось', 'вибрация', 'заземление', 'включение', 'ток', 'клюв', 'колено', 'Гренландия', 'семена', 'трап', 'цифра', 'обувь', 'плечо', 'чай', 'кадр', 'беседа', 'мгновение', 'турнир', 'шеф', 'дебет', 'энергия', 'кран', 'форма', 'клиент', 'глазок'], ['администратор', ' урок', ' клевать', ' олененок', ' аппликация', ' капля', ' ледниковый', ' глазунья', ' припев', ' воскресенье', ' дебри', ' хирург', ' фанфары', ' небритый', ' брюнет', ' бухта', ' поганка', ' навар', ' албания', ' вспотеть', ' стройка', ' бечевка', ' тальк', ' артишок', ' беж', ' пена', ' початок', ' чабрец', ' встряска', ' горшок', ' выгружать', ' океан', ' липнуть', ' кусать', ' графин', ' курорт', ' нараспашку', ' отвертка', ' бокал', ' арка', ' аватар', ' отражение', ' кофеварка', ' родня', ' щенок', ' грабли', ' плафон', ' часы', ' лязг', ' косарь'], ['субтитры', ' тушь', ' усы', ' диплом', ' рейтузы', ' терпкий', ' бальзам', ' созвездие', ' гильза', ' палуба', ' подремать', ' прага', ' кувырок', ' бегемот', ' кипа', ' фишка', ' уравнение', ' бампер', ' сеть', ' скипидар', ' абонемент', ' кнопка', ' лекарь', ' веснушки', ' дымка', ' газета', ' начистить', ' визитка', ' светильник', ' вигвам', ' пони', ' башня', ' гуляш', ' череда', ' монах', ' баклан', ' оберег', ' церковь', ' нарукавник', ' оглобля', ' сюсюкать', ' гололед', ' крещение', ' гиена', ' напялить', ' кувшин', ' луза', ' таз', ' мешок', ' алоэ'], ['незабудки', ' штиблеты', ' елозить', ' скрип', ' бренди', ' чеботы', ' молекула', ' порог', ' ремонт', ' бархат', ' аэростат', ' портсигар', ' автопилот', ' кашпо', ' дым', ' плюс', ' зеркальце', ' билы', ' мензурка', ' бабочка', ' список', ' целиться', ' хлопушки', ' рация', ' десна', ' шорох', ' зерно', ' трезубец', ' натянуть', ' светофор', ' жесть', ' овсянка', ' окантовка', ' чалма', ' рубин', ' козинаки', ' согреться', ' кружиться', ' забор', ' охапка', ' теорема', ' гравировка', ' восход', ' узда', ' склад', ' баобаб', ' брови', ' фрагмент', ' колышек', ' жестикулировать'], ['сморщиться', ' самокрутка', ' макет', ' винчестер', ' грудинка', ' черепица', ' колотушка', ' поршень', ' клюка', ' стража', ' кафейня', ' корица', ' старт', ' треск', ' серп', ' вентиль', ' геркулес', ' мимика', ' шомпол', ' кафтан', ' шкура', ' укроп', ' водокачка', ' вурдалак', ' сарай', ' ядра', ' акварель', ' ликер', ' обжарка', ' ударные', ' макушка', ' стакан', ' сукно', ' бульдозер', ' сода', ' витаминка', ' горностай', ' рукоятка', ' сатин', ' навага', ' автомобиль', ' куница', ' спички', ' яхта', ' автомат', ' пекарня', ' шут', ' прическа', ' китай', ' буфет'], ['мерин', ' погладить', ' соха', ' коршун', ' карлсон', ' катание', ' евро', ' трилистник', ' выход', ' удобрение', ' проход', ' капор', ' помазок', ' акрополь', ' лежанка', ' клин', ' гарнитур', ' ямщик', ' окно', ' кабриолет', ' телевизор', ' купальник', ' кинокамера', ' гарпун', ' ванты', ' диск', ' венок', ' косточка', ' утренник', ' респиратор', ' камыш', ' шило', ' ферма', ' очередь', ' звездопад', ' болт', ' танкер', ' еловый', ' пруд', ' кампус', ' гибкость', ' сумерки', ' антистатик', ' лиана', ' ланиты', ' обниматься', ' бумеранг', ' дождь', ' зеленый', ' сетка'], ['нерпа', ' аплодисменты', ' школа', ' шрифт', ' зонтик', ' емеля', ' азу', ' калина', ' пассатижи', ' рукав', ' глиссер', ' холодец', ' вазелин', ' дворник', ' свисток', ' щуп', ' турбина', ' берет', ' завиток', ' ночь', ' нарцисс', ' полив', ' сельпо', ' брезент', ' табакерка', ' батальон', ' джентельмен', ' малек', ' баранина', ' душ', ' бонсай', ' гейзер', ' рама', ' пеньюар', ' аккорд', ' этюд', ' берег', ' мундштук', ' улыбка', ' мандарин', ' ландыш', ' пилотка', ' двойка', ' охра', ' мультик', ' аптечка', ' мучной', ' драже', ' руда', ' миксер'], ['озон', ' ястреб', ' клещ', ' спуск', ' озеро', ' сосулька', ' купидон', ' пижама', ' мастерская', ' мята', ' поддон', ' самокат', ' прилавок', ' рубильник', ' бадминтон', ' уключина', ' распечатка', ' инъекция', ' чернильница', ' крылышки', ' выдох', ' лиловый', ' планер', ' ласковый', ' струна', ' март', ' отвес', ' домино', ' осетрина', ' фреска', ' верба', ' облегать', ' дож', ' гулливер', ' крючок', ' лакей', ' теплоход', ' чубук', ' шмыгать', ' бусы', ' удочка', ' укол', ' забросить', ' муляж', ' манок', ' какао', ' колоннада', ' дева', ' настурция', ' обивка'], ['напиток', ' оболочка', ' плошка', ' диамант', ' мотылек', ' дезодорант', ' янтарь', ' книксен', ' скрючиться', ' свинина', ' чердак', ' ушат', ' марганец', ' чертополох', ' чешуя', ' бордюр', ' сливки', ' обметать', ' вуаль', ' сито', ' оживленно', ' цикада', ' шафран', ' листва', ' гиббон', ' лохань', ' весы', ' жар-птица', ' молотилка', ' филе', ' оратор', ' чертог', ' открывалка', ' росток', ' саксофон', ' снайпер', ' косынка', ' огород', ' пингвин', ' челнок', ' понедельник', ' сноуборд', ' вопрос', ' пепельница', ' адрес', ' тушенка', ' лейка', ' киносъемка', ' лапка', ' качели'], ['каланча', ' свекла', ' щека', ' надпись', ' скалолаз', ' пустыня', ' станция', ' слоеный', ' самолет', ' соковыжималка', ' арест', ' пластинка', ' оранжерея', ' сверло', ' поцелуй', ' арматура', ' сережки', ' рига', ' набегать', ' ясень', ' вираж', ' баннер', ' миллион', ' вселенная', ' ледоход', ' шорты', ' щетина', ' насупиться', ' подошва', ' аргентина', ' университет', ' октябрь', ' нокаут', ' учет', ' мазь', ' очки', ' обь', ' сиплый', ' нарезка', ' помада', ' рубаха', ' щуриться', ' аквамарин', ' консервы', ' доклад', ' лужа', ' тюрьма', ' памятник', ' стена', ' нарвать'], ['лапоть', ' фата', ' ящерица', ' сиг', ' заяц', ' аккомпанемент', ' коляска', ' настройка', ' снижаться', ' мясистый', ' бицепс', ' портной', ' панорама', ' дисплей', ' сажень', ' доить', ' бадья', ' крылья', ' гранит', ' решка', ' коготь', ' эшелон', ' малевать', ' анчоус', ' глаза', ' солома', ' сом', ' всплеск', ' тесак', ' застежка', ' салоп', ' капитан', ' ресницы', ' батарейки', ' зевать', ' бузина', ' маяк', ' колокольчик', ' магистраль', ' намести', ' закоулок', ' волкодав', ' кожух', ' оправа', ' ацтеки', ' крот', ' храп', ' фрак', ' моросить', ' рубрика'], ['расписание', ' серьги', ' ледник', ' загогулина', ' меч', ' конвейер', ' мокрица', ' пыльца', ' беседа', ' монпансье', ' корень', ' биточки', ' лоханка', ' винтовка', ' гвалт', ' степь', ' рогожа', ' рябина', ' семена', ' блюдце', ' кочка', ' негатив', ' аркан', ' стая', ' зрачок', ' гитара', ' шампур', ' баклажан', ' кварц', ' унитаз', ' кожа', ' шлагбаум', ' спинка', ' струя', ' факел', ' алебарда', ' глинтвейн', ' рим', ' сальто', ' дудка', ' визг', ' прошивка', ' цикорий', ' лоскуток', ' баран', ' владение', ' бивни', ' брошь', ' швея', ' крендель'], ['умывальник', ' радиоприемник', ' зефир', ' наутек', ' ока', ' забег', ' лазер', ' окорочек', ' набережная', ' америка', ' саке', ' плита', ' ньюфаундлен', ' намордник', ' губы', ' магнитофон', ' вензель', ' стенд', ' щука', ' росчерк', ' медовый', ' этаж', ' косичка', ' смола', ' желудок', ' набойка', ' сверток', ' пунш', ' сеновал', ' ридикюль', ' дайкон', ' пурга', ' акваланг', ' порт', ' пыль', ' скотч', ' одеколон', ' пузырь', ' коктейль', ' орнамент', ' ливень', ' ворон', ' матрас', ' домофон', ' ключ', ' белка', ' араб', ' мошкара', ' говядина', ' дубляж'], ['сироп', ' латунь', ' стержень', ' мольберт', ' испарина', ' тяпка', ' косметика', ' укус', ' чертежник', ' пресс', ' вареники', ' шатен', ' грациозно', ' доска', ' вольер', ' френч', ' макияж', ' автопарк', ' дирижировать', ' апельсин', ' букет', ' нора', ' масленок', ' градусник', ' береза', ' батон', ' пластик', ' подвеска', ' корочка', ' бикини', ' тореадор', ' комкать', ' пасьянс', ' эскадра', ' стрижка', ' ядрица', ' кладовая', ' галера', ' замок', ' разворот', ' динозавр', ' костюм', ' ползти', ' копия', ' джунгли', ' моргать', ' озноб', ' трактир', ' витраж', ' китель'], ['зябко', 'забегаловка', 'тарелка', 'ручка', 'багор', 'гора', 'хлев', 'каска', 'огрызок', 'обломок', 'фавн', 'туман', 'чечетка', 'заземление', 'журнал', 'керамика', 'айда', 'треугольник', 'вакх', 'ситец', 'мрамор', 'посох', 'слоняться', 'термос', 'обсерватория', 'кортеж', 'пеликан', 'лабиринт', 'паровоз', 'лацкан', 'радиотелефон', 'червяк', 'гардина', 'кадык', 'балет', 'кинозал', 'бельведер', 'лайм', 'лопата', 'кормушка', 'трубочист', 'увядание', 'плотва', 'сырник', 'кисет', 'наркоз', 'артистка', 'развесистый', 'царапина', 'котлован'], ['дзюдо', 'сохатый', 'чернозем', 'кольцо', 'пень', 'фиакр', 'утки', 'копна', 'член', 'трюмо', 'альма-матер', 'чугунок', 'лучина', 'вскачь', 'репетиция', 'зеленка', 'авансцена', 'загримировать', 'изюм', 'парилка', 'лужайка', 'прицел', 'чертеж', 'глоток', 'автограф', 'нарзан', 'кипарис', 'лунка', 'пластырь', 'порошок', 'ржа', 'овчина', 'бегом', 'эволюция', 'клинок', 'круча', 'кабан', 'кузница', 'шпингалет', 'выключатель', 'просо', 'ревизор', 'мыльница', 'круп', 'гараж', 'развилка', 'шалить', 'соус', 'грузовик', 'минарет'], ['бижутерия', 'крыша', 'копейка', 'карниз', 'гренки', 'реставратор', 'сметана', 'десерт', 'аэропорт', 'фисташки', 'улица', 'кнут', 'лететь', 'зуд', 'надпилить', 'ядро', 'фосфоресцирующий', 'ячмень', 'слоган', 'форт', 'скальпель', 'куранты', 'ободок', 'пилотка', 'зачатие', 'италия', 'библиотека', 'муравей', 'водолей', 'лачуга', 'клизма', 'запруда', 'кий', 'минута', 'костел', 'букварь', 'взвесь', 'метрика', 'залп', 'салат', 'лазанья', 'арба', 'ингаляция', 'лепесток', 'железка', 'теннис', 'свиток', 'бисквит', 'линолеум', 'туалет'], ['урожай', 'волосы', 'колодец', 'груз', 'носилки', 'интернет', 'гомеопатия', 'мускулатура', 'таяние', 'черновик', 'проталина', 'вылет', 'листать', 'аромат', 'клюшка', 'пальма', 'уха', 'раструб', 'бандана', 'волан', 'ловушка', 'ноготь', 'барин', 'блесна', 'панда', 'муха', 'слесарь', 'евангелие', 'попона', 'вкуснятина', 'экспресс', 'жесткий', 'звоночек', 'угольник', 'магнит', 'медвежонок', 'волейбол', 'мансарда', 'сюртук', 'зазор', 'юпитер', 'селезень', 'аттракцион', 'капкан', 'пикап', 'олово', 'перекладина', 'уведомление', 'квадрат', 'ласты'], ['голубцы', 'пряжа', 'забористый', 'пиво', 'картошка', 'повар', 'термометр', 'коробочка', 'квартира', 'карта', 'жеманно', 'бензин', 'аккордеон', 'бриться', 'часовой', 'накрапывать', 'гонец', 'ластик', 'гарнитура', 'показ', 'трицепс', 'подснежник', 'колонна', 'газон', 'флаер', 'легковушка', 'кровля', 'комета', 'джемпер', 'сирена', 'зарево', 'мамалыга', 'кошелек', 'стручки', 'пароварка', 'льдина', 'трель', 'гирлянда', 'африка', 'супница', 'кабачок', 'бутыль', 'роща', 'монокль', 'джинсы', 'надламывать', 'бергамот', 'лагуна', 'план', 'дымок'], ['круассан', 'стрела', 'мотоцикл', 'авиасалон', 'кран', 'арык', 'икс', 'аметист', 'ночник', 'электричка', 'экскаватор', 'кеды', 'вилка', 'орден', 'керосин', 'перина', 'понтон', 'скипетр', 'трусики', 'лоно', 'татуаж', 'англия', 'ватин', 'дагерротип', 'изумруд', 'дали', 'засечка', 'зной', 'гардероб', 'интерьер', 'зуб', 'пастух', 'арена', 'урна', 'шпиль', 'сок', 'айва', 'осока', 'шашка', 'горбушка', 'ренессанс', 'валенки', 'чай', 'договор', 'лысина', 'береста', 'чистотел', 'охранник', 'метр', 'канделябр'], ['дубликат', 'киоск', 'бронь', 'барельеф', 'орех', 'усмешка', 'богатырь', 'кисель', 'маникюр', 'давка', 'жернов', 'менуэт', 'дубина', 'опечатка', 'терка', 'облако', 'иконостас', 'рисовать', 'манеж', 'олива', 'пароход', 'обойма', 'санки', 'тату', 'жевать', 'грош', 'металлолом', 'туча', 'трезврнить', 'бесконечность', 'настил', 'косточки', 'тряпка', 'казино', 'хна', 'велотрек', 'чистота', 'шеренга', 'торпеда', 'раскладушка', 'тяжесть', 'пелерина', 'горячительный', 'листопад', 'хамелеон', 'подкова', 'брошюра', 'чарка', 'обслуга', 'воронка'], ['бандероль', 'гавот', 'калоши', 'грампластинка', 'индонезия', 'кокон', 'гладиолус', 'ревень', 'прохлада', 'мадера', 'тюбетейка', 'теплица', 'пощечина', 'мальва', 'ватрушка', 'сучок', 'глажка', 'вяз', 'лилия', 'буран', 'изморозь', 'снеговик', 'поединок', 'эскадрилья', 'вантус', 'бра', 'штопать', 'лежбище', 'подосиновик', 'бивуак', 'рефрижератор', 'шарманка', 'табор', 'йог', 'выпечка', 'тропа', 'перемена', 'переход', 'хобот', 'подпевать', 'гуашь', 'амстердам', 'стойка', 'бутик', 'лопасть', 'ангел', 'буженина', 'кролик', 'линейка', 'монтаж'], ['хрусталь', 'турист', 'ампер', 'блик', 'автоген', 'папка', 'катапульта', 'блокнот', 'шаль', 'двушка', 'троица', 'латук', 'заплыв', 'скорлупа', 'стеллаж', 'парк', 'ластиться', 'петрушка', 'кобыла', 'обводить', 'кинотеатр', 'ценник', 'обеденный', 'крейсер', 'томат', 'корсет', 'воробей', 'сквозняк', 'обед', 'слоненок', 'свистулька', 'мельница', 'налегке', 'боржоми', 'эстакада', 'мебель', 'трансвестит', 'моток', 'чирикать', 'клочок', 'зажим', 'диспетчер', 'граффити', 'инжир', 'чашка', 'чек', 'бур', 'маятник', 'подметать', 'монитор'], ['нахлобучить', 'старец', 'проспект', 'лоск', 'намешать', 'мамонт', 'царевич', 'танец', 'жечь', 'задворки', 'циклоп', 'лакмусовый', 'бубенец', 'фундук', 'демонстрация', 'заваривать', 'подвязка', 'рокот', 'цирк', 'кузнечик', 'роса', 'особняк', 'ягель', 'ливрея', 'румба', 'торт', 'автобан', 'пояс', 'пряник', 'смолить', 'плюшевый', 'бюст', 'улитка', 'футболка', 'корма', 'возница', 'контрабанда', 'мазок', 'очи', 'кабель', 'сказитель', 'сканер', 'подмостки', 'неваляшка', 'пломба', 'граммофон', 'резак', 'цитата', 'кашель', 'ладонь'], ['гиппопотам', 'ярлык', 'навеселе', 'компьютер', 'брызговик', 'обрыв', 'рык', 'тупик', 'избушка', 'мавзолей', 'шнурок', 'хламида', 'карандаш', 'клипсы', 'всходы', 'скрипка', 'заклепка', 'гарнир', 'хлопок', 'ларчик', 'сталь', 'ельник', 'штопка', 'бриллиант', 'хлопья', 'лектор', 'выспаться', 'альт', 'искры', 'молодожены', 'трубка', 'меренга', 'разбойник', 'сиракузы', 'молоть', 'желатин', 'мопед', 'настричь', 'остров', 'киноактер', 'прислуга', 'юнга', 'тетерев', 'грим', 'накидка', 'бинт', 'лестничный', 'металл', 'осетр', 'сундук'], ['уклон', 'дюны', 'салют', 'вибрация', 'каллы', 'лавировать', 'аквариум', 'фуксия', 'щавель', 'мигом', 'устье', 'котенок', 'замуровать', 'буек', 'ботики', 'клякса', 'сандалии', 'паркет', 'полифония', 'метать', 'улочка', 'дверца', 'пинцет', 'адвокат', 'лимузин', 'королева', 'гербарий', 'паяльник', 'рощица', 'ниппель', 'кузня', 'отверстие', 'черпак', 'майка', 'презентация', 'наживка', 'развалины', 'салки', 'утиль', 'сумка', 'плуг', 'подсолнух', 'бабушка', 'гетры', 'абажур', 'гнет', 'вспахать', 'изголовье', 'розга', 'гобой'], ['бумажка', 'лазурь', 'аспирант', 'сваляться', 'ромб', 'тмин', 'река', 'тесьма', 'груда', 'сажа', 'соболь', 'оригами', 'камыши', 'часовщик', 'задуть', 'кувыркаться', 'планетарий', 'пакетик', 'фасоль', 'плющ', 'чулки', 'банка', 'сыр', 'слюни', 'треба', 'нахохлиться', 'прогулка', 'мяч', 'чихать', 'живот', 'коврик', 'наклейка', 'фотограф', 'опера', 'тропинка', 'колба', 'ипподром', 'око', 'румянец', 'рок', 'гофре', 'пугало', 'улов', 'ушить', 'единорог', 'трибуна', 'незабудка', 'утес', 'яйцо', 'байховый'], ['кинжал', 'ржавчина', 'нумизматика', 'мякоть', 'гриф', 'осень', 'локоть', 'грач', 'забрезжить', 'клевер', 'ночное', 'елка', 'эвкалипт', 'чадра', 'пушка', 'анемия', 'трап', 'шлюз', 'капюшон', 'сардельки', 'ноктюрн', 'дурачиться', 'парабола', 'нафталин', 'ботинки', 'кабинет', 'трос', 'заря', 'справочник', 'пучок', 'чернобурка', 'бахус', 'мидия', 'зевака', 'туника', 'инструмент', 'волны', 'безрукавка', 'комикс', 'зажигалка', 'уксус', 'лечо', 'кармен', 'малина', 'мануальщик', 'подкоп', 'оперение', 'индеец', 'жакет', 'каштан'], ['завеса', 'рогатина', 'поясница', 'покер', 'клюква', 'метла', 'бант', 'стамеска', 'огниво', 'одуванчик', 'удод', 'скамейка', 'полет', 'развертывать', 'насест', 'чесотка', 'поклон', 'лоб', 'шпагат', 'шов', 'рогатка', 'надуть', 'аттестат', 'календарь', 'тетива', 'июнь', 'резеда', 'пробирка', 'подбородок', 'пуанты', 'удав', 'луна', 'ювелир', 'анфас', 'равнина', 'рефлектор', 'налитой', 'маскарад', 'корзина', 'кочегарка', 'палисадник', 'бревно', 'пылесос', 'ледокол', 'коза', 'схема', 'совещание', 'рыба-меч', 'анаконда', 'выкройка'], ['мех', 'палас', 'пляска', 'родители', 'вариант', 'щупальца', 'ползком', 'тоннель', 'кинопленка', 'медный', 'револьвер', 'тренькать', 'хомяк', 'кунжут', 'кофемолка', 'змея', 'загар', 'черствый', 'манометр', 'жако', 'колено', 'бивак', 'снег', 'яранга', 'антрекот', 'гречка', 'лаванда', 'контрабас', 'варенье', 'жираф', 'эбонит', 'кружева', 'нефрит', 'дельфин', 'дублер', 'подберезовик', 'копье', 'кипятильник', 'вепрь', 'забросать', 'флокс', 'оладья', 'стриптиз', 'хныкать', 'пропись', 'набалдашник', 'натощак', 'булавка', 'магазин', 'хохотать'], ['поляна', 'мыльный', 'трефовый', 'стерлядь', 'картофель', 'шашлык', 'жетон', 'арбитр', 'питарда', 'ошибка', 'мафия', 'ржание', 'табун', 'рожок', 'наколка', 'шуруп', 'валерьянка', 'кипр', 'смородина', 'наизнанку', 'бриошь', 'ноготки', 'трамвай', 'морщинки', 'центрифуга', 'сифон', 'майонез', 'видеомагнетофон', 'гуськом', 'мизинец', 'пианино', 'тоник', 'синица', 'идол', 'беседка', 'село', 'нарты', 'сияние', 'татами', 'уж', 'бандаж', 'хмель', 'свет', 'финифть', 'мыс', 'копчик', 'горка', 'осьминог', 'братва', 'подгонка'], ['булка', 'бой', 'барабан', 'вельвет', 'радиорубка', 'касатка', 'мост', 'носки', 'спиртовка', 'полушарие', 'прожектор', 'седина', 'мокрый', 'карнавал', 'занавеска', 'карамель', 'рыбак', 'якорь', 'гриб', 'истома', 'зал', 'полено', 'глобус', 'акведук', 'тост', 'колыбельная', 'терраса', 'антарктида', 'скомкать', 'рельс', 'рак', 'крепость', 'виварий', 'мумия', 'уста', 'лаптоп', 'равновесие', 'роспись', 'непал', 'бактерия', 'отлив', 'росинант', 'освещение', 'пегас', 'лыжня', 'вертолет', 'плечо', 'лавина', 'ухмылка', 'унисон'], ['дерюга', 'трюфель', 'днище', 'трепет', 'цапля', 'свинец', 'почтальон', 'гуталин', 'обелиск', 'сугроб', 'писк', 'кубок', 'звездолет', 'обруч', 'диез', 'вермишель', 'взаимопонимание', 'нейлон', 'фонарь', 'пламя', 'стадион', 'канарейка', 'джем', 'убежище', 'фольга', 'кипяток', 'выудить', 'тапочек', 'удлинять', 'шарить', 'плинтус', 'петлица', 'дно', 'плотина', 'сустав', 'занос', 'гамак', 'австрия', 'скворец', 'вышивка', 'медведица', 'сдоба', 'резина', 'пейсы', 'велюр', 'планшет', 'бочка', 'венгрия', 'диктант', 'тарантул'], ['скоба', 'топаз', 'банкир', 'рычание', 'минога', 'дренаж', 'лайковый', 'киль', 'украшение', 'опушка', 'наледь', 'коала', 'шина', 'абхазия', 'лакомство', 'газель', 'лингафон', 'клубника', 'наждак', 'ватерлиния', 'размножение', 'минор', 'пироги', 'багаж', 'трафарет', 'губка', 'вышибала', 'ворох', 'щиколотка', 'жеребец', 'шарлотка', 'архангел', 'балласт', 'джип', 'барби', 'сомали', 'ежиться', 'чан', 'бункер', 'росомаха', 'галстук', 'валик', 'жмурки', 'экран', 'каскадер', 'акула', 'мириады', 'гель', 'ограда', 'посуда'], ['тюрбан', 'каратист', 'сабля', 'эмаль', 'туба', 'вертел', 'стекло', 'выстрел', 'бубен', 'тетрадь', 'бронза', 'компресс', 'штырь', 'галантерея', 'игрушка', 'галька', 'сгусток', 'цемент', 'халва', 'бюро', 'наколоть', 'рагу', 'виза', 'тигр', 'расклад', 'тир', 'дирижер', 'книжный', 'стопка', 'ужин', 'бублик', 'изолятор', 'паб', 'тюфяк', 'драпировка', 'мордочка', 'жюри', 'швырять', 'греция', 'дикобраз', 'пистолет', 'хватать', 'норвегия', 'ураган', 'ресторан', 'сегмент', 'гжель', 'суслик', 'леопард', 'напудриться'], ['стельки', 'ртуть', 'шлейф', 'лесенка', 'кухня', 'гренландия', 'радист', 'открытка', 'кожура', 'биатлон', 'пульс', 'соринка', 'свита', 'кинза', 'зазвонить', 'шелк', 'пемза', 'рубль', 'маковка', 'шествие', 'викторина', 'жестикуляция', 'повидло', 'репертуар', 'сеанс', 'линкор', 'твид', 'трейлер', 'сентябрь', 'пиццикато', 'позолота', 'паж', 'люстра', 'птенчик', 'болид', 'утенок', 'конус', 'ирис', 'черемша', 'лодыжка', 'дельтаплан', 'стоп', 'агат', 'покрышка', 'винегрет', 'участок', 'долька', 'почка', 'драгоценности', 'юг'], ['темень', 'карикатура', 'жук', 'сена', 'справка', 'верхом', 'бобы', 'роддом', 'конкур', 'скандинавия', 'саркофаг', 'поезд', 'чайхана', 'эскимо', 'сфера', 'скунс', 'долото', 'сверлить', 'хвостик', 'закалка', 'платина', 'клаксон', 'сыч', 'манускрипт', 'смета', 'шторм', 'кадило', 'подлить', 'пулемет', 'дракон', 'оценка', 'раки', 'литр', 'подвал', 'штамп', 'оковы', 'пампасы', 'каюта', 'головешка', 'кофр', 'чурбан', 'транскрипция', 'слеза', 'неон', 'семечки', 'грог', 'дефиле', 'вздох', 'плеер', 'загривок'], ['бумажник', 'вестибюль', 'ноябрь', 'абрикос', 'моторка', 'буря', 'качать', 'убраться', 'бутафория', 'цистерна', 'накомарник', 'престол', 'щебенка', 'узбек', 'жемчуг', 'треска', 'омск', 'хоровод', 'репортаж', 'доллар', 'доспехи', 'эполеты', 'ботва', 'сауна', 'повозка', 'сандал', 'анкета', 'сойка', 'мести', 'игуана', 'шланг', 'басня', 'валун', 'балдахин', 'усидчиво', 'жухлый', 'летчик', 'ехидна', 'антоновка', 'морс', 'лаваш', 'февраль', 'натирать', 'клавесин', 'лифт', 'переезд', 'австралия', 'завязка', 'стог', 'зыбь'], ['булава', 'растопка', 'погоны', 'полка', 'перчатка', 'шпалера', 'чеканка', 'бомбошка', 'галактика', 'яма', 'числитель', 'лоджия', 'таракашка', 'упражняться', 'мелко', 'марево', 'кружок', 'кресло', 'лимон', 'самогон', 'хлебать', 'хлеб', 'головоломка', 'колибри', 'очистки', 'жарить', 'утречком', 'папаха', 'мусор', 'насадка', 'конфитюр', 'ключник', 'нептун', 'стружка', 'пылинка', 'амперметр', 'балюстрада', 'скворечник', 'сахар', 'норка', 'угол', 'нагрянуть', 'глухарь', 'шпаклевка', 'тур', 'вернисаж', 'пицца', 'садовник', 'спросонок', 'аут'], ['лиса', 'побледнеть', 'разгрузка', 'победа', 'забрало', 'макраме', 'вафли', 'пава', 'ворота', 'люля-кебаб', 'спагетти', 'деревня', 'лом', 'автострада', 'антресоли', 'побережье', 'пилочка', 'кафель', 'нагромождение', 'наст', 'жалюзи', 'луч', 'диктор', 'фант', 'смеситель', 'вал', 'мюсли', 'подрамник', 'графит', 'ламбада', 'клеить', 'гранат', 'трусца', 'осанка', 'дизель', 'детвора', 'вратарь', 'крен', 'колода', 'кокос', 'глазурь', 'коробка', 'сыроежка', 'цыпочки', 'шпинат', 'атлант', 'зигзаг', 'навес', 'золото', 'мысок'], ['косилка', 'целый', 'ватман', 'танк', 'цепь', 'метеорит', 'кроссворд', 'вплавь', 'дюйм', 'массаж', 'нагреватель', 'валежник', 'боцман', 'бильярд', 'тошнота', 'сиамский', 'лапта', 'стокгольм', 'шляпа', 'зелень', 'кашалот', 'клубок', 'камелия', 'лотерея', 'рубашка', 'ложбина', 'курага', 'хаки', 'коньяк', 'буренка', 'мокасины', 'облачно', 'гольфы', 'ладан', 'корешок', 'иней', 'жгут', 'медь', 'баюкать', 'настойка', 'ролики', 'излучина', 'русалка', 'ледышка', 'осадки', 'зажигание', 'сапфир', 'троллейбус', 'эстония', 'мякиш'], ['вагонетка', 'фаршировать', 'гонщик', 'краски', 'рододендрон', 'винт', 'парик', 'самосвал', 'помидор', 'свекольник', 'дрожжи', 'астролог', 'фанера', 'инкассатор', 'ежик', 'кавычки', 'конферансье', 'наушники', 'талон', 'прыжки', 'белуга', 'коридор', 'балка', 'червячок', 'платан', 'голиаф', 'мозаика', 'горелка', 'жила', 'антракт', 'зима', 'торос', 'уголок', 'мандолина', 'расшифровка', 'этажерка', 'встреча', 'вырез', 'молния', 'пихта', 'сургуч', 'гастроном', 'обшлаг', 'трюм', 'мыло', 'вилы', 'ракита', 'гопак', 'щит', 'трубочка'], ['касторка', 'дневник', 'физика', 'интервал', 'вкус', 'подчеркивать', 'рыбалка', 'курилка', 'морковь', 'бук', 'стриж', 'микрофон', 'книга', 'хижина', 'надзиратель', 'полонез', 'митинг', 'лопатка', 'шрам', 'подкинуть', 'филармония', 'намалевать', 'зазывала', 'золушка', 'убор', 'цокать', 'модерн', 'фазан', 'зачет', 'рубец', 'гадалка', 'колея', 'васильки', 'швартовать', 'портмоне', 'покрывало', 'химера', 'заварочный', 'антарктика', 'шкатулка', 'заголовок', 'заедать', 'надкусывать', 'лен', 'чебурашка', 'гантели', 'работяга', 'расслоение', 'труба', 'бал'], ['жилет', 'кратер', 'оркестр', 'кукушка', 'ветки', 'лира', 'моржи', 'ключица', 'тягучий', 'траншея', 'суп', 'динамик', 'напалм', 'вброд', 'теленок', 'парковка', 'накалить', 'след', 'шкаф', 'брус', 'ходули', 'рыба', 'штиль', 'икар', 'кобура', 'ишак', 'ливия', 'баранка', 'масленка', 'сеттер', 'завтрак', 'паром', 'омуль', 'латать', 'спаржа', 'разлив', 'ранец', 'зарядка', 'портье', 'шприц', 'подвода', 'партитура', 'сценарий', 'лакированный', 'портал', 'крюк', 'лепить', 'мезонин', 'лепетать', 'вампир'], ['сачок', 'баксы', 'бриз', 'бак', 'будильник', 'забрызгать', 'мушкетеры', 'финики', 'алжир', 'чад', 'парад', 'квартет', 'парус', 'клеймо', 'штык', 'утка', 'антенна', 'ширма', 'бретелька', 'лютик', 'саван', 'лопоухий', 'компот', 'ковер', 'кальсоны', 'сервировка', 'сталактиты', 'блондин', 'курица', 'ламинат', 'град', 'амбар', 'затвор', 'обои', 'камин', 'блузка', 'трясина', 'хитон', 'фужер', 'кегли', 'папироса', 'линька', 'расческа', 'стругать', 'коньки', 'омут', 'полынья', 'поджать', 'сквер', 'каноэ'], ['забивать', 'печень', 'тюль', 'лавр', 'кладка', 'вода', 'перец', 'курок', 'слон', 'склон', 'ряска', 'окапывать', 'сыворотка', 'ложка', 'туфли', 'смоковница', 'сайт', 'лещ', 'суфле', 'нефть', 'завал', 'тираж', 'мохер', 'ниша', 'гладкий', 'ветка', 'мошка', 'наутилус', 'арлекин', 'дека', 'грядка', 'древко', 'скит', 'лукошко', 'пескарь', 'микстура', 'кетчуп', 'столовая', 'махорка', 'тема', 'наколенник', 'радуга', 'наркотик', 'хлопать', 'гарцевать', 'морзянка', 'носик', 'свора', 'объектив', 'маска'], ['танцзал', 'сухари', 'бригантина', 'наседка', 'изогнуть', 'ошейник', 'кафе', 'дрозд', 'банда', 'промокашка', 'индиго', 'сераль', 'кизил', 'электробритва', 'подглядеть', 'тельняшка', 'брусника', 'ласка', 'вобла', 'брусья', 'сад', 'ананас', 'орган', 'парить', 'рюмка', 'фальцевать', 'блендер', 'чаепитие', 'горничная', 'авокадо', 'голень', 'шлем', 'маляр', 'метро', 'свадьба', 'пифагор', 'ларец', 'ментол', 'рапира', 'миниатюра', 'коряга', 'давление', 'график', 'чиновник', 'бланк', 'пустырник', 'маргаритка', 'бабуин', 'топчан', 'желе'], ['робот', 'белила', 'фокстерьер', 'абзац', 'списывать', 'алфавит', 'надувной', 'гандбол', 'шарж', 'футболист', 'ритм', 'прилив', 'поплавок', 'кладовка', 'единица', 'безмен', 'фляга', 'впадина', 'тренировка', 'розмарин', 'тряска', 'фаянс', 'грибы', 'козлы', 'ком', 'чибис', 'пляж', 'редька', 'рыба-молот', 'тамбурин', 'сонет', 'корнишон', 'мастерить', 'пятак', 'штора', 'гусь', 'барбекю', 'помыть', 'капуста', 'ходики', 'сосуд', 'ил', 'иллюминатор', 'пакля', 'семга', 'цыпленок', 'топор', 'виски', 'пастила', 'наличные'], ['банкет', 'уступ', 'галоши', 'песок', 'брудершафт', 'камень', 'булыжник', 'лаборатория', 'фокус', 'семафор', 'тюбик', 'сцена', 'пловец', 'увеличить', 'терем', 'черенок', 'фара', 'кидаться', 'бульвар', 'барбарис', 'лезгинка', 'шезлонг', 'полоса', 'выправка', 'раздевалка', 'год', 'унты', 'ложечка', 'сбербанк', 'полуостров', 'пюре', 'плиссе', 'лилипут', 'подшипник', 'бензопила', 'фюзеляж', 'резинка', 'плащ', 'чернила', 'цех', 'нашпиговать', 'твист', 'полк', 'пчела', 'микроскоп', 'поэзия', 'звон', 'тайга', 'каток', 'блинчик'], ['плести', 'силикон', 'портфель', 'дворец', 'заколка', 'пачка', 'желток', 'шимпанзе', 'настежь', 'тамбур', 'габардин', 'велосипед', 'засуха', 'сосна', 'липучка', 'демон', 'папоротник', 'просека', 'калька', 'ляжка', 'черчение', 'табло', 'редактор', 'жеребенок', 'морской', 'котлета', 'задраивать', 'липа', 'матрешка', 'англичанин', 'мармелад', 'тайфун', 'скакалка', 'двоеточие', 'батискаф', 'сертификат', 'буханка', 'мадагаскар', 'рессора', 'пазлы', 'ручей', 'обертка', 'мышка', 'брод', 'диджей', 'хлам', 'гравий', 'счет', 'кувалда', 'дождевик'], ['аксиома', 'биде', 'кочерга', 'сокол', 'фейверк', 'желоб', 'нежиться', 'конюшня', 'трико', 'опята', 'картон', 'виадук', 'паук', 'украина', 'апостроф', 'бетономешалка', 'грунт', 'моцарт', 'львица', 'моль', 'линялый', 'корм', 'белизна', 'огнемет', 'вьюга', 'гамма', 'чемодан', 'сушь', 'пистон', 'шахматы', 'античность', 'взгляд', 'абордаж', 'марля', 'плоскодонка', 'мед', 'рамка', 'навыкат', 'дятел', 'лицо', 'чаща', 'фыркать', 'набег', 'леденец', 'монарх', 'дуга', 'расстановка', 'плетенка', 'нарды', 'сверчок'], ['шифер', 'звонарь', 'сова', 'шампунь', 'эхо', 'вахтер', 'фиксаж', 'ускакать', 'обстрел', 'пион', 'наперегонки', 'риф', 'кольчуга', 'король', 'парашют', 'медальон', 'тромбон', 'гусли', 'лезвие', 'портфолио', 'художник', 'экскурсия', 'рукопожатие', 'тафта', 'дворняга', 'погожий', 'смерч', 'белье', 'плюшки', 'тройка', 'целлофан', 'рынок', 'пекинес', 'батист', 'штопор', 'мороженое', 'утрамбовать', 'коптильня', 'обочина', 'пирог', 'мантия', 'телега', 'выпад', 'перо', 'нимб', 'фляжка', 'дупло', 'колье', 'царапать', 'бык'], ['мираж', 'крыло', 'лоскут', 'корыто', 'барьер', 'всмятку', 'дрессировать', 'выхухоль', 'можжевельник', 'тостер', 'сморчок', 'кувшинка', 'чернослив', 'лай', 'диафрагма', 'фальшивить', 'дудочка', 'поле', 'замазка', 'мартышка', 'карьер', 'безе', 'эскалатор', 'бистро', 'мясорубка', 'брелок', 'медведь', 'такса', 'наляпать', 'транспарант', 'увертюра', 'туф', 'перевал', 'прибой', 'кепка', 'икебана', 'лебедь', 'мышь', 'парча', 'куртка', 'бутсы', 'банан', 'зародыш', 'вязать', 'енот', 'оттиск', 'кактус', 'кость', 'летать', 'чайная'], ['диван', 'самбука', 'скафандр', 'йога', 'файл', 'карусель', 'рябчик', 'блоха', 'сабо', 'свинка', 'голубь', 'варежки', 'лист', 'мадонна', 'гусеница', 'приручать', 'носорог', 'трава', 'тарантелла', 'лузга', 'спутник', 'обувь', 'гепард', 'чучело', 'пришелец', 'мусс', 'пяльцы', 'калитка', 'кабаре', 'харчевня', 'цукат', 'альпинизм', 'клеенка', 'щи', 'гарнизон', 'дом', 'фигурный', 'коттедж', 'отвар', 'ирландия', 'доза', 'экспонат', 'снаряжение', 'фараон', 'пылишь', 'подземка', 'чеканить', 'аул', 'тапки', 'кубик'], ['горстка', 'телекинез', 'трельяж', 'перрон', 'тюлень', 'двигатель', 'болонка', 'клубень', 'пышечка', 'соль', 'накипь', 'балда', 'горн', 'корка', 'знак', 'рог', 'слипнуться', 'задачник', 'фойе', 'лакрица', 'рубка', 'кафетерий', 'щегол', 'латы', 'бисер', 'платежка', 'пила', 'саженцы', 'закорючка', 'малинник', 'реквизит', 'сгущенка', 'виолончель', 'венец', 'автосервис', 'бейсбол', 'кобылица', 'пудинг', 'доверху', 'финиш', 'хариус', 'поливитамин', 'свирель', 'ванна', 'земля', 'насухо', 'краги', 'затон', 'трясти', 'щепка'], ['горох', 'двухкассетник', 'акробат', 'шквал', 'витрина', 'занавес', 'гребенка', 'инкрустация', 'гром', 'гранула', 'сера', 'жестковатый', 'фонарик', 'жилище', 'дюймовочка', 'брага', 'водка', 'дилижанс', 'пират', 'вишни', 'контрамарка', 'конструктор', 'исландия', 'стадо', 'джин', 'челн', 'сорока', 'мушкетер', 'заварка', 'ракета', 'задвижка', 'тряпье', 'пашня', 'автогонка', 'бридж', 'урюк', 'настольный', 'подсветка', 'аллея', 'покрасить', 'лайка', 'игла', 'ряса', 'лампа', 'встряхнуть', 'лук', 'лосьон', 'акация', 'батончик', 'фабрика'], ['салазки', 'перчатки', 'бобр', 'поворот', 'епископ', 'конфета', 'театр', 'компас', 'ваниль', 'ксерокс', 'дартс', 'замша', 'пломбир', 'миллиметровка', 'синус', 'прыгать', 'конфорка', 'рот', 'лев', 'ратуша', 'танцор', 'мигалка', 'вакса', 'портьера', 'песочница', 'камбуз', 'медовик', 'шалопай', 'целоваться', 'бутон', 'марш', 'приправа', 'амфитеатр', 'рюмочка', 'ребятишки', 'слиток', 'меню', 'жокей', 'гамбургер', 'тепло', 'затрещина', 'мойка', 'дирижабль', 'конспект', 'огонь', 'аэродром', 'нож', 'станок', 'воланчик', 'рой'], ['транзит', 'агнец', 'шпиц', 'галушки', 'излучать', 'заросли', 'гипс', 'сирень', 'мускат', 'вымпел', 'кружево', 'луковица', 'чеснок', 'лабрадор', 'гребля', 'плескаться', 'утварь', 'планета', 'ноль', 'карась', 'паланкин', 'намусорить', 'ницца', 'мумие', 'помахать', 'бескозырка', 'аспирин', 'дорожка', 'лось', 'саламандра', 'амулет', 'окулист', 'закуток', 'честь', 'щепотка', 'слива', 'асимметрия', 'пончо', 'европа', 'пончики', 'шпора', 'змий', 'пар', 'резьба', 'лото', 'выдра', 'удила', 'полог', 'батька', 'закупка'], ['радар', 'скумбрия', 'бор', 'гимнаст', 'лепнина', 'шагать', 'насос', 'капот', 'масленица', 'тазик', 'хоккеист', 'примерка', 'лизнуть', 'блюз', 'палка', 'циркуль', 'маринад', 'нашивка', 'краситься', 'йод', 'монумент', 'каучук', 'северное', 'аккумулятор', 'бровь', 'серебро', 'инки', 'подпоясаться', 'поднос', 'поводок', 'бег', 'фонтан', 'стручок', 'подшофе', 'рыбешка', 'барсук', 'тушканчик', 'деготь', 'паранджа', 'милостыня', 'опалубка', 'гамлет', 'левша', 'фотоаппарат', 'дерево', 'утро', 'веер', 'росинка', 'марципан', 'подкладка'], ['олифа', 'ваза', 'зоопарк', 'закипеть', 'драп', 'звонок', 'бастурма', 'пиджак', 'толчок', 'хата', 'бамбук', 'рысак', 'пилить', 'эстафета', 'эфир', 'сахара', 'нырять', 'пунктир', 'колоть', 'бит', 'гармонь', 'пирога', 'радиатор', 'пуловер', 'аура', 'гномик', 'овощ', 'корт', 'овчарка', 'кассета', 'молитвенник', 'лава', 'грива', 'вкладыш', 'гроздь', 'скелет', 'гостиница', 'порох', 'селедка', 'простыня', 'резной', 'жид', 'темница', 'гоголь', 'муфта', 'газ', 'миссисипи', 'сор', 'лютня', 'пшено'], ['стеклышко', 'рукавица', 'грачи', 'начинка', 'фронт', 'телеграф', 'сервантес', 'пирожок', 'напильник', 'какаду', 'абрис', 'метроном', 'флажок', 'локомотив', 'калоша', 'нацедить', 'пандус', 'сухофрукты', 'стейк', 'лыжи', 'пуговица', 'балерина', 'бульдог', 'веник', 'скатерть', 'тыква', 'тень', 'локон', 'снежинка', 'жижа', 'фейхоа', 'май', 'рулон', 'линять', 'общага', 'когти', 'икона', 'режиссер', 'водитель', 'торшер', 'облупленный', 'биржа', 'верстка', 'выколачивать', 'подпись', 'мозг', 'речка', 'каблук', 'трюк', 'помпон'], ['кудряшка', 'наискосок', 'обида', 'лаять', 'слизняк', 'тарахтеть', 'индекс', 'нырок', 'духовка', 'скважина', 'пух', 'хор', 'таранить', 'ахиллес', 'сердце', 'бобслей', 'свод', 'детектив', 'оперетта', 'цыган', 'закладка', 'мешковина', 'возмужать', 'руккола', 'синяк', 'межа', 'румяна', 'хрестоматия', 'галеты', 'буй', 'дискета', 'макака', 'боярин', 'бутылка', 'спрут', 'мимоза', 'мулине', 'фрамуга', 'неровность', 'иглотерапия', 'калейдоскоп', 'лучистый', 'моцарелла', 'кофточка', 'завивать', 'кит', 'тина', 'балкон', 'накраситься', 'гладиатор'], ['крестик', 'секира', 'ампир', 'тиканье', 'запонка', 'терн', 'распутица', 'клешня', 'хихикать', 'одежда', 'фитиль', 'рыжий', 'палитра', 'таракан', 'ярмарка', 'дорога', 'рассада', 'кузнец', 'канистра', 'мышонок', 'манка', 'лакомка', 'музей', 'стрекоза', 'наличность', 'эмблема', 'коленка', 'судак', 'лупа', 'мерседес', 'челка', 'кол', 'иероглиф', 'овод', 'тундра', 'волна', 'барс', 'угощать', 'конопля', 'бульон', 'скала', 'ставни', 'колосок', 'шалфей', 'ясновидец', 'брынза', 'галерея', 'контакт', 'навзрыд', 'водомерка'], ['барометр', 'рака', 'икра', 'мышца', 'хворост', 'кентавр', 'знамя', 'канкан', 'охота', 'порожняком', 'бар', 'всхлипывание', 'туя', 'альпинист', 'бугор', 'башмак', 'асбест', 'кровать', 'телеграмма', 'черви', 'запевала', 'кардиган', 'речитатив', 'заплатка', 'лакировка', 'колобок', 'растяжение', 'череп', 'ссадина', 'черевички', 'скалка', 'дуэль', 'лотос', 'заварушка', 'дог', 'медаль', 'клок', 'номерок', 'гибралтар', 'джерси', 'арап', 'лопух', 'турникет', 'стихи', 'макинтош', 'чехарда', 'купюра', 'бекон', 'бордо', 'фарфор'], ['крахмал', 'короб', 'рождество', 'насыпь', 'магнолия', 'страус', 'лобстер', 'имбирь', 'босиком', 'помпа', 'слайд', 'японцы', 'хватка', 'жимолость', 'тишина', 'паводок', 'птеродактиль', 'месса', 'шасси', 'пирс', 'подставка', 'крыса', 'мухомор', 'порей', 'пшеница', 'шахтер', 'твердый', 'брюшко', 'тактильный', 'эстрада', 'мобильник', 'гончар', 'партер', 'грудь', 'письмо', 'портрет', 'дрель', 'натурщица', 'лаборант', 'гайка', 'соты', 'акробатика', 'барокко', 'накачивать', 'плексиглас', 'сковорода', 'июль', 'сейф', 'леска', 'дуэт'], ['мостик', 'любовник', 'палатка', 'мол', 'чернь', 'реформа', 'ремень', 'невод', 'ухаб', 'жужжать', 'клетка', 'бахча', 'хризантема', 'киностудия', 'дерматин', 'боярышник', 'морось', 'жаворонок', 'стежок', 'маргарин', 'сервиз', 'ультразвук', 'слепок', 'ковшик', 'артикль', 'запах', 'ушанка', 'клен', 'кукуруза', 'прожилки', 'вокзал', 'томагавк', 'бельканто', 'распродажа', 'матадор', 'рубанок', 'поместье', 'крокус', 'атом', 'алый', 'колыбель', 'гашетка', 'кустарник', 'сгрести', 'разбег', 'мазут', 'черемуха', 'экипаж', 'домкрат', 'копилка'], ['нагайка', 'сазан', 'виноградинка', 'миска', 'котел', 'скользкий', 'обложка', 'полоскание', 'арфа', 'жало', 'кориандр', 'жульен', 'галоп', 'бефстроганов', 'бушлат', 'водоросли', 'упругость', 'значок', 'боулинг', 'молоток', 'ладушки', 'шпилька', 'съезд', 'изгиб', 'ассорти', 'ниагара', 'балансир', 'сантиметр', 'форшмак', 'клюв', 'набивка', 'проволока', 'крошки', 'икота', 'баллончик', 'натюрморт', 'мазать', 'кишмиш', 'напрямик', 'канат', 'здоровяк', 'вразвалочку', 'усадьба', 'волынка', 'кларнет', 'пешком', 'качка', 'филин', 'карман', 'венчание'], ['дамба', 'уголь', 'репейник', 'споткнуться', 'чума', 'кирпич', 'брасс', 'арбалет', 'точка', 'скорбей', 'пробка', 'цепочка', 'роза', 'млечный', 'синева', 'воз', 'джайв', 'тунец', 'шпага', 'волнушка', 'аукцион', 'лоток', 'флейта', 'парник', 'пуф', 'ступенька', 'декабрь', 'соловей', 'груздь', 'цитрусовые', 'фургон', 'полевка', 'единогласно', 'дегустация', 'горсть', 'хмелеть', 'класс', 'вдох', 'обшивка', 'веретено', 'лекало', 'ерш', 'трапеция', 'ладья', 'авторучка', 'фантик', 'принтер', 'цимбалы', 'алтарь', 'севрюга'], ['каскад', 'дыня', 'буклет', 'чехол', 'укрытие', 'шейка', 'спина', 'айсберг', 'альбатрос', 'собеседник', 'креветка', 'нашинковать', 'опора', 'взлет', 'дебаркадер', 'кедр', 'ребятня', 'код', 'коралл', 'помигать', 'задремать', 'бязь', 'настенный', 'войлок', 'аэроплан', 'самба', 'кариатида', 'швабра', 'вечер', 'поликлиника', 'овечка', 'слалом', 'фикус', 'контроллер', 'хрупкий', 'туз', 'сидр', 'лежак', 'арбуз', 'валторна', 'попугай', 'кремний', 'разность', 'сайгак', 'долина', 'загиб', 'фасад', 'апрель', 'ветер', 'увалень'], ['бас', 'лебеда', 'весло', 'вешалка', 'снежок', 'четки', 'застолье', 'крона', 'проба', 'холм', 'иголка', 'укротитель', 'весна', 'надушенный', 'улей', 'эскиз', 'нагишом', 'мыть', 'юла', 'куб', 'воск', 'виноград', 'сноп', 'плато', 'лама', 'альбом', 'холодильник', 'амурчик', 'легавая', 'наконечник', 'ждать', 'лепешка', 'бровка', 'египет', 'железо', 'пупок', 'уезд', 'мошки', 'чугун', 'овраг', 'дантист', 'чабан', 'гроза', 'животик', 'манекен', 'гимнастерка', 'вальс', 'тенистый', 'опахало', 'гимнастика'], ['хмуриться', 'кастрюля', 'известка', 'фтор', 'плов', 'катушка', 'мчаться', 'фрукт', 'бетонка', 'гиря', 'червь', 'рупор', 'авиатор', 'запястье', 'литавры', 'доктор', 'рассол', 'гашиш', 'белоснежка', 'таблица', 'течение', 'подстаканник', 'бигуди', 'тарантас', 'молот', 'намылить', 'азалия', 'чистилище', 'катать', 'винни-пух', 'седло', 'терпение', 'глюкоза', 'гвоздика', 'кокарда', 'котомка', 'сорбет', 'плот', 'треуголка', 'раввин', 'кисть', 'минералка', 'татуировка', 'плакат', 'ствол', 'язь', 'бритва', 'йогурт', 'тявкать', 'творог'], ['клавиши', 'мат', 'манто', 'панк', 'дьюти-фри', 'мулла', 'дискотека', 'поварешка', 'багет', 'наган', 'косить', 'винтаж', 'борщ', 'скутер', 'август', 'лайнер', 'напыление', 'ведро', 'зайка', 'юбка', 'наличник', 'борсетка', 'колыбелька', 'серьга', 'шкив', 'размах', 'лето', 'прослойка', 'молоко', 'позвоночник', 'раковина', 'оникс', 'топот', 'аптека', 'разрез', 'сорняк', 'амфора', 'заноза', 'атлас', 'подоконник', 'лидер', 'макать', 'арахис', 'кулак', 'жаба', 'брюки', 'банкомат', 'крыльцо', 'мазня', 'нло'], ['котелок', 'смычок', 'ракетка', 'тачанка', 'жучок', 'элегантный', 'ребус', 'духи', 'инструкция', 'бармалей', 'круг', 'слякоть', 'складки', 'зразы', 'катер', 'гвоздь', 'отпечаток', 'трещотка', 'хрен', 'астра', 'марка', 'катакомбы', 'фарш', 'луноход', 'литера', 'лак', 'похлебка', 'пещера', 'крыжовник', 'штемпель', 'рога', 'чайник', 'вывеска', 'богиня', 'садок', 'невесомость', 'ежевика', 'навстречу', 'холст', 'ромашка', 'пассаж', 'кефир', 'глина', 'лагерь', 'хвоя', 'завитушка', 'раскат', 'сало', 'вентилятор', 'кофе'], ['вклейка', 'альков', 'диктофон', 'шампиньон', 'болото', 'туго', 'тиски', 'кульман', 'каравай', 'сруб', 'поджарить', 'лить', 'омнибус', 'аляска', 'ножны', 'обогреватель', 'библия', 'швеция', 'ведомость', 'фартук', 'походка', 'кейс', 'подстричь', 'медуза', 'бултых', 'лосось', 'умывание', 'накрахмалить', 'ералаш', 'карета', 'лед', 'репа', 'фьорд', 'лощина', 'узор', 'парафин', 'кенгуру', 'продавец', 'указка', 'ранчо', 'аммиак', 'небо', 'бусинка', 'бахрома', 'бумага', 'бастион', 'закат', 'щель', 'эластичный', 'вздремнуть'], ['баррикада', 'горчичник', 'груша', 'алюминий', 'дрова', 'елочка', 'пластилин', 'лимонный', 'коробок', 'полотенце', 'трамплин', 'запеканка', 'тюльпан', 'асфальт', 'чулан', 'дверь', 'вход', 'шарик', 'официант', 'мишура', 'кемпинг', 'космодром', 'ухо', 'очечник', 'мечеть', 'аэробика', 'кадка', 'ягуар', 'курган', 'бемоль', 'вырвать', 'ножик', 'двустволка', 'ацетон', 'штукатурка', 'полотно', 'лозунг', 'мох', 'небоскреб', 'лангет', 'плетень', 'хвост', 'примус', 'формула', 'вена', 'волк', 'жара', 'степ', 'сэндвич', 'лямка'], ['бедро', 'ура', 'намазать', 'кружка', 'балалайка', 'кашица', 'гусар', 'панно', 'мяукать', 'окунь', 'париж', 'маковый', 'остановка', 'жезл', 'парочка', 'разбогатеть', 'корзинка', 'блины', 'клавиша', 'колючка', 'титры', 'свист', 'хлыст', 'женьшень', 'брусчатка', 'крокодил', 'роллы', 'викинг', 'борода', 'мятный', 'монастырь', 'форель', 'обкосить', 'гимн', 'лодка', 'фаэтон', 'лампада', 'смахнуть', 'ребро', 'фокстрот', 'глазок', 'морозильник', 'гнездо', 'марионетка', 'чардаш', 'подмигнуть', 'палочка', 'отжим', 'иллюзионист', 'орхидея'], ['жвачка', 'ухватка', 'баня', 'защелка', 'флаг', 'чаевые', 'бабуля', 'ателье', 'индианка', 'салон', 'процессор', 'декорации', 'эпиграф', 'ласточка', 'брожение', 'нос', 'травки', 'подсвечник', 'подмышки', 'мачта', 'навыпуск', 'ворона', 'полушубок', 'качалка', 'автопробег', 'головастик', 'бренчать', 'морошка', 'морж', 'сигара', 'пузыри', 'задача', 'тренинг', 'розарий', 'лангуст', 'книжка', 'желудь', 'шалаш', 'выхлоп', 'серенада', 'сари', 'оклик', 'ползунки', 'стебель', 'рассвет', 'торба', 'намазывать', 'казак', 'ходить', 'батут'], ['половица', 'окурок', 'талисман', 'провод', 'опоссум', 'яичница', 'шмель', 'стюардесса', 'кардинал', 'пенальти', 'пузырек', 'сдача', 'пружина', 'масло', 'глянцевый', 'коромысло', 'лоза', 'еда', 'пододеяльник', '', 'каракатица', 'выковать', 'косинус', 'створка', 'анис', 'фейерверк', 'рев', 'смуглый', 'педаль', 'приз', 'автобус', 'спираль', 'мангуст', 'кондитерская', 'месить', 'пергамент', 'шоссе', 'прополоскать', 'сковородка', 'трактор', 'бармен', 'овал', 'носок', 'свая', 'проворно', 'легкие', 'лента', 'солнышко', 'флакон', 'вереск'], ['кочегар', 'чум', 'пляс', 'иисус', 'жасмин', 'лишайник', 'ладить', 'автошкола', 'море', 'локоны', 'клеточка', 'стук', 'морфий', 'изразец', 'касса', 'хвощ', 'саквояж', 'реклама', 'табурет', 'щтрудель', 'печь', 'подол', 'тролль', 'шхуна', 'шить', 'оса', 'тамада', 'гипюр', 'браслет', 'софа', 'сопло', 'разносчик', 'байк', 'рытвина', 'корпеть', 'баркас', 'лебедка', 'свеча', 'убаюкать', 'як', 'макулатура', 'цилиндр', 'гобелен', 'клей', 'яшма', 'предбанник', 'стул', 'штурм', 'версаль', 'постель'], ['шпроты', 'затмение', 'мороз', 'цент', 'наковальня', 'папайа', 'тахта', 'балык', 'чайка', 'сторожка', 'налокотник', 'новостройка', 'амазонка', 'тля', 'звезда', 'липа', 'ферзь', 'тибет', 'скрепка', 'турник', 'муравейник', 'параллелепипед', 'родник', 'сопка', 'бассейн', 'набекрень', 'чириканье', 'суфлер', 'девятка', 'интерфейс', 'выступ', 'лавка', 'листовка', 'погреб', 'блок', 'вытяжка', 'шея', 'зола', 'сервант', 'корневище', 'олень', 'афиша', 'лягушка', 'конверт', 'филателия', 'уток', 'хризантемы', 'ром', 'билет', 'обводка'], ['листок', 'субмарина', 'флюгер', 'ветровка', 'обклеить', 'метель', 'матовый', 'печать', 'вискоза', 'жар', 'пасека', 'собака', 'шкала', 'бизон', 'грейдер', 'фаланга', 'мелочь', 'уступить', 'фонари', 'наморщить', 'вилла', 'гольф', 'поток', 'омлет', 'горчица', 'канифоль', 'акция', 'мятый', 'эскорт', 'тачка', 'огурец', 'намокнуть', 'монета', 'моллюск', 'аллюр', 'замерзнуть', 'отара', 'кадр', 'тормошить', 'шашки', 'рикша', 'крапива', 'экватор', 'нюхать', 'ракушка', 'гейша', 'снегопад', 'дихлофос', 'ковш', 'пельмени'], ['штанга', 'поиск', 'алгебра', 'гомон', 'шпулька', 'авоська', 'грелка', 'верблюд', 'выставка', 'щекотка', 'мениск', 'зяблик', 'футбол', 'узел', 'лоция', 'контур', 'хрипотца', 'пройма', 'пористый', 'индия', 'мыться', 'жатва', 'дырокол', 'утеплитель', 'ковать', 'потоп', 'вулкан', 'шест', 'дыбом', 'рябь', 'завивка', 'рокер', 'спирт', 'токарь', 'засов', 'борозда', 'ливретка', 'маэстро', 'вакцина', 'ружье', 'колечко', 'регулировщик', 'солнце', 'лапник', 'розетка', 'дольмен', 'солянка', 'щетка', 'кепи', 'эллипс'], ['тайник', 'чиж', 'функция', 'гадать', 'ремешок', 'льдинка', 'тампон', 'шлюпка', 'комната', 'тополь', 'руины', 'электрик', 'косуля', 'тротуар', 'наволочка', 'алыча', 'ожерелье', 'хруст', 'панцирь', 'скирда', 'шах', 'угадать', 'голубика', 'голубизна', 'баржа', 'спицы', 'дружина', 'секундомер', 'тулуп', 'ондатра', 'кудахтать', 'запятая', 'лес', 'бархан', 'черника', 'капсула', 'ива', 'тапер', 'нуга', 'пика', 'ель', 'лиственница', 'цоколь', 'сарафан', 'аппетит', 'гадюка', 'босоножки', 'каменоломня', 'площадь', 'кастет'], ['шериф', 'транспортер', 'тренер', 'пудра', 'колчан', 'метелка', 'обгон', 'колпак', 'колготки', 'космос', 'лазоревый', 'каникулы', 'гороскоп', 'цыгане', 'записка', 'зеркало', 'ушко', 'кимоно', 'заволакивать', 'набедренный', 'шнуровать', 'тефтели', 'салфетки', 'напольный', 'линза', 'скорпион', 'сени', 'шепот', 'подушка', 'пума', 'оскар', 'шинель', 'заступ', 'ящик', 'траулер', 'юкатан', 'копирка', 'клавиатура', 'нива', 'воротник', 'худеть', 'спецовка', 'кипение', 'напор', 'жмых', 'фламинго', 'дрезина', 'масляный', 'экзамен', 'кора'], ['плеск', 'ситечко', 'слюнявчик', 'удить', 'палец', 'мука', 'космонавт', 'лампочка', 'цесарка', 'комод', 'яблоко', 'ривердэнс', 'бинокль', 'кипятить', 'цокот', 'сено', 'слова', 'накладная', 'скребок', 'дуплет', 'газировка', 'горизонт', 'угорь', 'фиалка', 'равиолли', 'интеграл', 'попкорн', 'сардинка', 'родинка', 'портвейн', 'пантомима', 'помадка', 'карточка', 'патока', 'штриховать', 'сахарница', 'морковка', 'настой', 'рысь', 'аист', 'софит', 'луг', 'заслон', 'кислый', 'грейпфрут', 'лужок', 'разминка', 'убирать', 'вожжи', 'яблоня'], ['танго', 'лимонад', 'свитер', 'колени', 'клеиться', 'ротонда', 'тушить', 'арктика', 'берлога', 'малиновый', 'чаша', 'жажда', 'блеск', 'упряжка', 'платье', 'мерцать', 'стол', 'кисточка', 'шофер', 'автовокзал', 'ангар', 'апатит', 'фагот', 'сатурн', 'шнур', 'зонт', 'дерн', 'толкотня', 'обмылок', 'салями', 'траектория', 'парламент', 'мальчишка', 'пристегнуть', 'табак', 'плойка', 'ольха', 'сморкаться', 'орел', 'набухать', 'щипать', 'макароны', 'мопс', 'нутрия', 'сани', 'посылка', 'дремать', 'платформа', 'учитель', 'катиться'], ['бедуин', 'оскомина', 'шевелюра', 'миндаль', 'точилка', 'спальник', 'моряк', 'караван', 'вагон', 'переносица', 'баритон', 'аквапарк', 'валет', 'дырка', 'развитие', 'грот', 'дания', 'околица', 'тычинка', 'приседать', 'трепыхаться', 'байкал', 'баул', 'фотография', 'пальто', 'xsкамзол', 'штурвал', 'баян', 'вишня', 'липкий', 'леший', 'марганцовка', 'чуни', 'смех', 'наверстать', 'надписать', 'гондола', 'таксофон', 'микроавтобус', 'оборка', 'подровнять', 'мясо', 'петля', 'едкий', 'анонс', 'объезд', 'подсолить', 'шаг', 'зайчонок', 'погремушка'], ['окалина', 'винил', 'хребет', 'удар', 'артикуляция', 'пиала', 'дыхание', 'картина', 'авиабилет', 'кальян', 'собор', 'волокно', 'копоть', 'плазма', 'вершина', 'вышка', 'тибр', 'повязка', 'решетка', 'перстень', 'трасса', 'утеплить', 'поручни', 'бомонд', 'платок', 'чресла', 'вино', 'клуб', 'калач', 'контейнер', 'рояль', 'репродуктор', 'мерзнуть', 'отшельник', 'ножницы', 'сапоги', 'цыкать', 'галифе', 'маслина', 'крышка', 'пирамида', 'базилик', 'дуб', 'бардак', 'сенбернар', 'земляника', 'марс', 'пилястра', 'краб', 'благовония'], ['ринг', 'брюква', 'кошка', 'осина', 'планктон', 'почта', 'жемчужина', 'одеяло', 'зебра', 'псков', 'буйвол', 'рампа', 'блюдо', 'пурпур', 'палтус', 'матрешка', 'регистр', 'пенал', 'шнурки', 'авто', 'базар', 'побелка', 'ансамбль', 'волнистый', 'резец', 'суховей', 'декольте', 'пушинка', 'ложа', 'авиамодель', 'фалда', 'иллюстрация', 'корабль', 'черешня', 'пуля', 'рюкзак', 'изнанка', 'изгородь', 'энциклопедия', 'офорт', 'мел', 'спидометр', 'подшить', 'лапша', 'хомут', 'подиум', 'пятка', 'каемка', 'шлепанцы', 'передача'], ['ломка', 'шхеры', 'хрюшка', 'козлик', 'уздцы', 'халат', 'краска', 'обезьяна', 'готика', 'рука', 'либретто', 'испания', 'байдарка', 'марихуана', 'буксир', 'бродить', 'фантики', 'математика', 'ущелье', 'шерсть', 'милиция', 'плюмаж', 'глыба', 'мгла', 'новоселье', 'налим', 'трубадур', 'ров', 'букашка', 'интервью', 'карлик', 'туземец', 'корова', 'мозоль', 'лиф', 'грильяж', 'тугрик', 'кот', 'шишка', 'юкка', 'слойка', 'младенец', 'водопровод', 'этикетка', 'фактура', 'петух', 'варьете', 'денди', 'мак', 'осел'], ['срез', 'антилопа', 'латиница', 'байковый', 'карты', 'рыльце', 'подлокотник', 'мишень', 'дробь', 'стилет', 'причал', 'джокер', 'пуховик', 'бурундук', 'сброс', 'обмундирование', 'реверанс', 'словарь', 'циферблат', 'двор', 'раунд', 'коса', 'мустанг', 'радиола', 'дымоход', 'рис', 'светлячок', 'копыто', 'ежегодник', 'изба', 'домра', 'диаграмма', 'лазейка', 'малолитражка', 'аврора', 'заводь', 'рукопись', 'червоточина', 'сбруя', 'циновка', 'сурок', 'полки', 'геена', 'спонсор', 'А', 'нектар', 'батарея', 'павлин', 'лялька', 'крем'], ['минус', 'конфетти', 'цедра', 'шоколадка', 'зажмуриться', 'чуб', 'черепаха', 'мышеловка', 'гуща', 'шапка', 'регулятор', 'гонг', 'клацать', 'рыцарь', 'озимые', 'негр', 'ерзать', 'гладь', 'решето', 'ножовка', 'куст', 'ниц', 'бирюза', 'полоть', 'кувырком', 'мочалка', 'растирание', 'шайба', 'артерия', 'юрта', 'муть', 'редиска', 'телефон', 'штаны', 'контрольная', 'трон', 'кремль', 'баттерфляй', 'водопад', 'будка', 'хрипеть', 'дуршлаг', 'эскимос', 'штуцер', 'индейка', 'банджо', 'холод', 'чебурек', 'обхват', 'витязь'], ['вялить', 'подливка', 'руль', 'рептилия', 'щипцы', 'вездеход', 'январь', 'фисташка', 'полководец', 'засада', 'тумбочка', 'бирка', 'перила', 'ладошка', 'шелковица', 'жабры', 'тент', 'камера', 'тюря', 'бурелом', 'бакенбарды', 'перепел', 'жердь', 'матрица', 'омар', 'енисей', 'манжета', 'патефон', 'постамент', 'гипербола', 'мим', 'тональность', 'челюсть', 'стирка', 'квас', 'накинуть', 'ковбой', 'горячий', 'кашне', 'талый', 'помять', 'задрапировать', 'комар', 'нанизывать', 'ворковать', 'клык', 'дюбель', 'ворс', 'гоголь-моголь', 'шелест'], ['червонец', 'веревка', 'грузия', 'утконос', 'махать', 'суффикс', 'панель', 'кальмар', 'лорнет', 'лань', 'сырок', 'паутина', 'нить', 'веранда', 'зипун', 'лазурный', 'лайкра', 'почерк', 'высотный', 'пюпитр', 'нитка', 'малахит', 'наперсток', 'черта', 'овес', 'гималаи', 'саванна', 'паста', 'пешка', 'иордан', 'карапуз', 'галка', 'распорядок', 'тесто', 'фея', 'анаша', 'самовар', 'ветчина', 'голограмма', 'брызги', 'месяц', 'снегирь', 'уравновесить', 'стежка', 'шуба', 'кузов', 'мотор', 'репейник', 'мажор', 'филателист'], ['ленивец', 'таверна', 'бельэтаж', 'жест', 'кулинария', 'хлопушка', 'велотренажер', 'кудри', 'сольфеджио', 'яхонт', 'номер', 'швейцар', 'заправка', 'печенье', 'масть', 'бювар', 'санаторий', 'смс', 'финка', 'скоморох', 'шелуха', 'колесо', 'зубр', 'боа', 'клубочек', 'рычаг', 'скула', 'герань', 'утюг', 'дача', 'джаз', 'рулетка', 'кредитка', 'люк', 'обливаться', 'простокваша', 'эльф', 'гулянье', 'окрошка', 'кобра', 'улюлюкать', 'обмен', 'поросенок', 'гол', 'хорда', 'глицерин', 'лошадь', 'часовня', 'деньги', 'баскетбол'], ['дробилка', 'вращение', 'наводнение', 'таблетка', 'покатый', 'фиалки', 'журавль', 'октава', 'лампас', 'смокинг', 'разгон', 'пристань', 'студень', 'штакетник', 'таиланд', 'фильтр', 'нарисовать', 'шампанское', 'рожь', 'шершень', 'маршрут', 'жонглер', 'хорватия', 'эллинг', 'бокс', 'козерог', 'мусоропровод', 'гавкать', 'бакен', 'борона', 'франция', 'каша', 'лицедей', 'вата', 'крупа', 'химик', 'шоколад', 'накручивать', 'шакал', 'ларек', 'аккуратно', 'тунис', 'вдрызг', 'хорек', 'шарф', 'костер', 'бенгальский', 'сварка', 'полиглот', 'такси']];
+
+var capitalizeFirstLetter = function capitalizeFirstLetter(string) {
+    return string.charAt(0).toUpperCase() + string.slice(1);
 };
+var getWordsList = exports.getWordsList = function getWordsList() {
+    var words = WORDS_DB[Math.floor(Math.random() * WORDS_DB.length)];
+    words[0] = capitalizeFirstLetter(words[0]);
+    return words;
+};
+
 exports.default = WORDS_DB;
 
 /***/ }),
-/* 88 */
+/* 86 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10853,21 +10770,21 @@ module.exports = factory;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 89 */
+/* 87 */
 /***/ (function(module, exports, __webpack_require__) {
 
-exports = module.exports = __webpack_require__(90)(false);
+exports = module.exports = __webpack_require__(88)(false);
 // imports
 
 
 // module
-exports.push([module.i, "html {\n  font: 16px/1.5 'Helvetica', 'Arial', sans-serif; }\n\nh1 {\n  color: #162556; }\n\n.app-wrapper {\n  margin: auto 50px; }\n\n.instructions {\n  background-color: #afbcff;\n  border: 1px dashed #565656;\n  padding: 25px;\n  border-radius: 10px;\n  margin-bottom: 50px;\n  margin-left: -25px; }\n", ""]);
+exports.push([module.i, "html {\n  font: 16px/1.5 'Helvetica', 'Arial', sans-serif;\n  position: relative;\n  min-height: 100%; }\n\nh1 {\n  color: #162556;\n  display: inline-block;\n  height: 78px; }\n\n.app-wrapper {\n  margin: 0 20px;\n  position: relative; }\n\n.app-header {\n  height: 100px;\n  margin-bottom: 20px;\n  display: table; }\n  .app-header-text {\n    font-size: 24px;\n    color: #162556;\n    position: relative;\n    display: table-cell;\n    vertical-align: middle; }\n\n.app-footer {\n  margin-top: 12vh; }\n\n.instructions {\n  background-color: #afbcff;\n  border: 1px dashed #565656;\n  padding: 15px;\n  border-radius: 10px;\n  margin-bottom: 15px;\n  margin-left: -15px; }\n\n.donation-wrapper {\n  position: relative;\n  bottom: 0;\n  left: 0; }\n\n.donation-button {\n  border: 1px solid yellow;\n  cursor: pointer;\n  background: #ffe5a3;\n  border-radius: 10px;\n  padding: 8px 13px 8px 9px;\n  font-size: 14px;\n  position: absolute;\n  right: 0;\n  bottom: 0; }\n\n.donation-form {\n  display: none;\n  position: absolute;\n  right: 0px;\n  bottom: 43px; }\n\n.gt-logo {\n  float: left;\n  margin-right: 20px;\n  height: 100px; }\n  .gt-logo img {\n    margin-bottom: -42px; }\n\n.words-list {\n  margin-bottom: 30px; }\n", ""]);
 
 // exports
 
 
 /***/ }),
-/* 90 */
+/* 88 */
 /***/ (function(module, exports) {
 
 /*
@@ -10949,7 +10866,7 @@ function toComment(sourceMap) {
 
 
 /***/ }),
-/* 91 */
+/* 89 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -10957,11 +10874,9 @@ function toComment(sourceMap) {
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -10986,24 +10901,22 @@ function camelize(string) {
 module.exports = camelize;
 
 /***/ }),
-/* 92 */
+/* 90 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
 
 
 
-var camelize = __webpack_require__(91);
+var camelize = __webpack_require__(89);
 
 var msPattern = /^-ms-/;
 
@@ -11031,7 +10944,7 @@ function camelizeStyleName(string) {
 module.exports = camelizeStyleName;
 
 /***/ }),
-/* 93 */
+/* 91 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11039,16 +10952,14 @@ module.exports = camelizeStyleName;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * 
  */
 
-var isTextNode = __webpack_require__(101);
+var isTextNode = __webpack_require__(99);
 
 /*eslint-disable no-bitwise */
 
@@ -11076,7 +10987,7 @@ function containsNode(outerNode, innerNode) {
 module.exports = containsNode;
 
 /***/ }),
-/* 94 */
+/* 92 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11084,11 +10995,9 @@ module.exports = containsNode;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -11209,7 +11118,7 @@ module.exports = createArrayFromMixed;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 95 */
+/* 93 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11217,11 +11126,9 @@ module.exports = createArrayFromMixed;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -11230,8 +11137,8 @@ module.exports = createArrayFromMixed;
 
 var ExecutionEnvironment = __webpack_require__(6);
 
-var createArrayFromMixed = __webpack_require__(94);
-var getMarkupWrap = __webpack_require__(96);
+var createArrayFromMixed = __webpack_require__(92);
+var getMarkupWrap = __webpack_require__(94);
 var invariant = __webpack_require__(1);
 
 /**
@@ -11299,7 +11206,7 @@ module.exports = createNodesFromMarkup;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 96 */
+/* 94 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11307,11 +11214,9 @@ module.exports = createNodesFromMarkup;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  */
 
@@ -11400,17 +11305,15 @@ module.exports = getMarkupWrap;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 97 */
+/* 95 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -11444,7 +11347,7 @@ function getUnboundedScrollPosition(scrollable) {
 module.exports = getUnboundedScrollPosition;
 
 /***/ }),
-/* 98 */
+/* 96 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11452,11 +11355,9 @@ module.exports = getUnboundedScrollPosition;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -11482,24 +11383,22 @@ function hyphenate(string) {
 module.exports = hyphenate;
 
 /***/ }),
-/* 99 */
+/* 97 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
 
 
 
-var hyphenate = __webpack_require__(98);
+var hyphenate = __webpack_require__(96);
 
 var msPattern = /^ms-/;
 
@@ -11526,7 +11425,7 @@ function hyphenateStyleName(string) {
 module.exports = hyphenateStyleName;
 
 /***/ }),
-/* 100 */
+/* 98 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11534,11 +11433,9 @@ module.exports = hyphenateStyleName;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -11556,7 +11453,7 @@ function isNode(object) {
 module.exports = isNode;
 
 /***/ }),
-/* 101 */
+/* 99 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11564,16 +11461,14 @@ module.exports = isNode;
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
 
-var isNode = __webpack_require__(100);
+var isNode = __webpack_require__(98);
 
 /**
  * @param {*} object The object to check.
@@ -11586,17 +11481,15 @@ function isTextNode(object) {
 module.exports = isTextNode;
 
 /***/ }),
-/* 102 */
+/* 100 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * 
  * @typechecks static-only
@@ -11621,17 +11514,15 @@ function memoizeStringOnly(callback) {
 module.exports = memoizeStringOnly;
 
 /***/ }),
-/* 103 */
+/* 101 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
@@ -11649,7 +11540,7 @@ if (ExecutionEnvironment.canUseDOM) {
 module.exports = performance || {};
 
 /***/ }),
-/* 104 */
+/* 102 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11657,16 +11548,14 @@ module.exports = performance || {};
 
 /**
  * Copyright (c) 2013-present, Facebook, Inc.
- * All rights reserved.
  *
- * This source code is licensed under the BSD-style license found in the
- * LICENSE file in the root directory of this source tree. An additional grant
- * of patent rights can be found in the PATENTS file in the same directory.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
  *
  * @typechecks
  */
 
-var performance = __webpack_require__(103);
+var performance = __webpack_require__(101);
 
 var performanceNow;
 
@@ -11688,7 +11577,7 @@ if (performance.now) {
 module.exports = performanceNow;
 
 /***/ }),
-/* 105 */
+/* 103 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11701,11 +11590,25 @@ module.exports = performanceNow;
 
 
 
+var printWarning = function() {};
+
 if (process.env.NODE_ENV !== 'production') {
-  var invariant = __webpack_require__(55);
-  var warning = __webpack_require__(56);
-  var ReactPropTypesSecret = __webpack_require__(53);
+  var ReactPropTypesSecret = __webpack_require__(54);
   var loggedTypeFailures = {};
+  var has = Function.call.bind(Object.prototype.hasOwnProperty);
+
+  printWarning = function(text) {
+    var message = 'Warning: ' + text;
+    if (typeof console !== 'undefined') {
+      console.error(message);
+    }
+    try {
+      // --- Welcome to debugging React ---
+      // This error was thrown as a convenience so that you can use this stack
+      // to find the callsite that caused this warning to fire.
+      throw new Error(message);
+    } catch (x) {}
+  };
 }
 
 /**
@@ -11722,7 +11625,7 @@ if (process.env.NODE_ENV !== 'production') {
 function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
   if (process.env.NODE_ENV !== 'production') {
     for (var typeSpecName in typeSpecs) {
-      if (typeSpecs.hasOwnProperty(typeSpecName)) {
+      if (has(typeSpecs, typeSpecName)) {
         var error;
         // Prop type validation may throw. In case they do, we don't want to
         // fail the render phase where it didn't fail before. So we log it.
@@ -11730,12 +11633,28 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
         try {
           // This is intentionally an invariant that gets caught. It's the same
           // behavior as without this statement except with a better message.
-          invariant(typeof typeSpecs[typeSpecName] === 'function', '%s: %s type `%s` is invalid; it must be a function, usually from ' + 'the `prop-types` package, but received `%s`.', componentName || 'React class', location, typeSpecName, typeof typeSpecs[typeSpecName]);
+          if (typeof typeSpecs[typeSpecName] !== 'function') {
+            var err = Error(
+              (componentName || 'React class') + ': ' + location + ' type `' + typeSpecName + '` is invalid; ' +
+              'it must be a function, usually from the `prop-types` package, but received `' + typeof typeSpecs[typeSpecName] + '`.'
+            );
+            err.name = 'Invariant Violation';
+            throw err;
+          }
           error = typeSpecs[typeSpecName](values, typeSpecName, componentName, location, null, ReactPropTypesSecret);
         } catch (ex) {
           error = ex;
         }
-        warning(!error || error instanceof Error, '%s: type specification of %s `%s` is invalid; the type checker ' + 'function must return `null` or an `Error` but returned a %s. ' + 'You may have forgotten to pass an argument to the type checker ' + 'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' + 'shape all require an argument).', componentName || 'React class', location, typeSpecName, typeof error);
+        if (error && !(error instanceof Error)) {
+          printWarning(
+            (componentName || 'React class') + ': type specification of ' +
+            location + ' `' + typeSpecName + '` is invalid; the type checker ' +
+            'function must return `null` or an `Error` but returned a ' + typeof error + '. ' +
+            'You may have forgotten to pass an argument to the type checker ' +
+            'creator (arrayOf, instanceOf, objectOf, oneOf, oneOfType, and ' +
+            'shape all require an argument).'
+          );
+        }
         if (error instanceof Error && !(error.message in loggedTypeFailures)) {
           // Only monitor this failure once because there tends to be a lot of the
           // same error.
@@ -11743,10 +11662,23 @@ function checkPropTypes(typeSpecs, values, location, componentName, getStack) {
 
           var stack = getStack ? getStack() : '';
 
-          warning(false, 'Failed %s type: %s%s', location, error.message, stack != null ? stack : '');
+          printWarning(
+            'Failed ' + location + ' type: ' + error.message + (stack != null ? stack : '')
+          );
         }
       }
     }
+  }
+}
+
+/**
+ * Resets warning cache when testing.
+ *
+ * @private
+ */
+checkPropTypes.resetWarningCache = function() {
+  if (process.env.NODE_ENV !== 'production') {
+    loggedTypeFailures = {};
   }
 }
 
@@ -11755,7 +11687,7 @@ module.exports = checkPropTypes;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 106 */
+/* 104 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -11768,13 +11700,33 @@ module.exports = checkPropTypes;
 
 
 
-var emptyFunction = __webpack_require__(54);
-var invariant = __webpack_require__(55);
-var warning = __webpack_require__(56);
+var ReactIs = __webpack_require__(178);
 var assign = __webpack_require__(4);
 
-var ReactPropTypesSecret = __webpack_require__(53);
-var checkPropTypes = __webpack_require__(105);
+var ReactPropTypesSecret = __webpack_require__(54);
+var checkPropTypes = __webpack_require__(103);
+
+var has = Function.call.bind(Object.prototype.hasOwnProperty);
+var printWarning = function() {};
+
+if (process.env.NODE_ENV !== 'production') {
+  printWarning = function(text) {
+    var message = 'Warning: ' + text;
+    if (typeof console !== 'undefined') {
+      console.error(message);
+    }
+    try {
+      // --- Welcome to debugging React ---
+      // This error was thrown as a convenience so that you can use this stack
+      // to find the callsite that caused this warning to fire.
+      throw new Error(message);
+    } catch (x) {}
+  };
+}
+
+function emptyFunctionThatReturnsNull() {
+  return null;
+}
 
 module.exports = function(isValidElement, throwOnDirectAccess) {
   /* global Symbol */
@@ -11865,6 +11817,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
     any: createAnyTypeChecker(),
     arrayOf: createArrayOfTypeChecker,
     element: createElementTypeChecker(),
+    elementType: createElementTypeTypeChecker(),
     instanceOf: createInstanceTypeChecker,
     node: createNodeChecker(),
     objectOf: createObjectOfTypeChecker,
@@ -11918,12 +11871,13 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
       if (secret !== ReactPropTypesSecret) {
         if (throwOnDirectAccess) {
           // New behavior only for users of `prop-types` package
-          invariant(
-            false,
+          var err = new Error(
             'Calling PropTypes validators directly is not supported by the `prop-types` package. ' +
             'Use `PropTypes.checkPropTypes()` to call them. ' +
             'Read more at http://fb.me/use-check-prop-types'
           );
+          err.name = 'Invariant Violation';
+          throw err;
         } else if (process.env.NODE_ENV !== 'production' && typeof console !== 'undefined') {
           // Old behavior for people using React.PropTypes
           var cacheKey = componentName + ':' + propName;
@@ -11932,15 +11886,12 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
             // Avoid spamming the console because they are often not actionable except for lib authors
             manualPropTypeWarningCount < 3
           ) {
-            warning(
-              false,
+            printWarning(
               'You are manually calling a React.PropTypes validation ' +
-              'function for the `%s` prop on `%s`. This is deprecated ' +
+              'function for the `' + propFullName + '` prop on `' + componentName  + '`. This is deprecated ' +
               'and will throw in the standalone `prop-types` package. ' +
               'You may be seeing this warning due to a third-party PropTypes ' +
-              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.',
-              propFullName,
-              componentName
+              'library. See https://fb.me/react-warning-dont-call-proptypes ' + 'for details.'
             );
             manualPropTypeCallCache[cacheKey] = true;
             manualPropTypeWarningCount++;
@@ -11984,7 +11935,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
   }
 
   function createAnyTypeChecker() {
-    return createChainableTypeChecker(emptyFunction.thatReturnsNull);
+    return createChainableTypeChecker(emptyFunctionThatReturnsNull);
   }
 
   function createArrayOfTypeChecker(typeChecker) {
@@ -12020,6 +11971,18 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
     return createChainableTypeChecker(validate);
   }
 
+  function createElementTypeTypeChecker() {
+    function validate(props, propName, componentName, location, propFullName) {
+      var propValue = props[propName];
+      if (!ReactIs.isValidElementType(propValue)) {
+        var propType = getPropType(propValue);
+        return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected a single ReactElement type.'));
+      }
+      return null;
+    }
+    return createChainableTypeChecker(validate);
+  }
+
   function createInstanceTypeChecker(expectedClass) {
     function validate(props, propName, componentName, location, propFullName) {
       if (!(props[propName] instanceof expectedClass)) {
@@ -12034,8 +11997,17 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 
   function createEnumTypeChecker(expectedValues) {
     if (!Array.isArray(expectedValues)) {
-      process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOf, expected an instance of array.') : void 0;
-      return emptyFunction.thatReturnsNull;
+      if (process.env.NODE_ENV !== 'production') {
+        if (arguments.length > 1) {
+          printWarning(
+            'Invalid arguments supplied to oneOf, expected an array, got ' + arguments.length + ' arguments. ' +
+            'A common mistake is to write oneOf(x, y, z) instead of oneOf([x, y, z]).'
+          );
+        } else {
+          printWarning('Invalid argument supplied to oneOf, expected an array.');
+        }
+      }
+      return emptyFunctionThatReturnsNull;
     }
 
     function validate(props, propName, componentName, location, propFullName) {
@@ -12046,8 +12018,14 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
         }
       }
 
-      var valuesString = JSON.stringify(expectedValues);
-      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + propValue + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
+      var valuesString = JSON.stringify(expectedValues, function replacer(key, value) {
+        var type = getPreciseType(value);
+        if (type === 'symbol') {
+          return String(value);
+        }
+        return value;
+      });
+      return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of value `' + String(propValue) + '` ' + ('supplied to `' + componentName + '`, expected one of ' + valuesString + '.'));
     }
     return createChainableTypeChecker(validate);
   }
@@ -12063,7 +12041,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
         return new PropTypeError('Invalid ' + location + ' `' + propFullName + '` of type ' + ('`' + propType + '` supplied to `' + componentName + '`, expected an object.'));
       }
       for (var key in propValue) {
-        if (propValue.hasOwnProperty(key)) {
+        if (has(propValue, key)) {
           var error = typeChecker(propValue, key, componentName, location, propFullName + '.' + key, ReactPropTypesSecret);
           if (error instanceof Error) {
             return error;
@@ -12077,21 +12055,18 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 
   function createUnionTypeChecker(arrayOfTypeCheckers) {
     if (!Array.isArray(arrayOfTypeCheckers)) {
-      process.env.NODE_ENV !== 'production' ? warning(false, 'Invalid argument supplied to oneOfType, expected an instance of array.') : void 0;
-      return emptyFunction.thatReturnsNull;
+      process.env.NODE_ENV !== 'production' ? printWarning('Invalid argument supplied to oneOfType, expected an instance of array.') : void 0;
+      return emptyFunctionThatReturnsNull;
     }
 
     for (var i = 0; i < arrayOfTypeCheckers.length; i++) {
       var checker = arrayOfTypeCheckers[i];
       if (typeof checker !== 'function') {
-        warning(
-          false,
+        printWarning(
           'Invalid argument supplied to oneOfType. Expected an array of check functions, but ' +
-          'received %s at index %s.',
-          getPostfixForTypeWarning(checker),
-          i
+          'received ' + getPostfixForTypeWarning(checker) + ' at index ' + i + '.'
         );
-        return emptyFunction.thatReturnsNull;
+        return emptyFunctionThatReturnsNull;
       }
     }
 
@@ -12223,6 +12198,11 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
       return true;
     }
 
+    // falsy value can't be a Symbol
+    if (!propValue) {
+      return false;
+    }
+
     // 19.4.3.5 Symbol.prototype[@@toStringTag] === 'Symbol'
     if (propValue['@@toStringTag'] === 'Symbol') {
       return true;
@@ -12297,6 +12277,7 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
   }
 
   ReactPropTypes.checkPropTypes = checkPropTypes;
+  ReactPropTypes.resetWarningCache = checkPropTypes.resetWarningCache;
   ReactPropTypes.PropTypes = ReactPropTypes;
 
   return ReactPropTypes;
@@ -12305,17 +12286,17 @@ module.exports = function(isValidElement, throwOnDirectAccess) {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 107 */
+/* 105 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
 
 
-module.exports = __webpack_require__(121);
+module.exports = __webpack_require__(119);
 
 
 /***/ }),
-/* 108 */
+/* 106 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12392,7 +12373,7 @@ var ARIADOMPropertyConfig = {
 module.exports = ARIADOMPropertyConfig;
 
 /***/ }),
-/* 109 */
+/* 107 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12408,7 +12389,7 @@ module.exports = ARIADOMPropertyConfig;
 
 var ReactDOMComponentTree = __webpack_require__(5);
 
-var focusNode = __webpack_require__(50);
+var focusNode = __webpack_require__(51);
 
 var AutoFocusUtils = {
   focusDOMComponent: function () {
@@ -12419,7 +12400,7 @@ var AutoFocusUtils = {
 module.exports = AutoFocusUtils;
 
 /***/ }),
-/* 110 */
+/* 108 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12435,9 +12416,9 @@ module.exports = AutoFocusUtils;
 
 var EventPropagators = __webpack_require__(21);
 var ExecutionEnvironment = __webpack_require__(6);
-var FallbackCompositionState = __webpack_require__(116);
-var SyntheticCompositionEvent = __webpack_require__(159);
-var SyntheticInputEvent = __webpack_require__(162);
+var FallbackCompositionState = __webpack_require__(114);
+var SyntheticCompositionEvent = __webpack_require__(157);
+var SyntheticInputEvent = __webpack_require__(160);
 
 var END_KEYCODES = [9, 13, 27, 32]; // Tab, Return, Esc, Space
 var START_KEYCODE = 229;
@@ -12806,7 +12787,7 @@ var BeforeInputEventPlugin = {
 module.exports = BeforeInputEventPlugin;
 
 /***/ }),
-/* 111 */
+/* 109 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -12820,14 +12801,14 @@ module.exports = BeforeInputEventPlugin;
 
 
 
-var CSSProperty = __webpack_require__(57);
+var CSSProperty = __webpack_require__(55);
 var ExecutionEnvironment = __webpack_require__(6);
 var ReactInstrumentation = __webpack_require__(8);
 
-var camelizeStyleName = __webpack_require__(92);
-var dangerousStyleValue = __webpack_require__(169);
-var hyphenateStyleName = __webpack_require__(99);
-var memoizeStringOnly = __webpack_require__(102);
+var camelizeStyleName = __webpack_require__(90);
+var dangerousStyleValue = __webpack_require__(167);
+var hyphenateStyleName = __webpack_require__(97);
+var memoizeStringOnly = __webpack_require__(100);
 var warning = __webpack_require__(2);
 
 var processStyleName = memoizeStringOnly(function (styleName) {
@@ -13025,7 +13006,7 @@ module.exports = CSSPropertyOperations;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 112 */
+/* 110 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13046,10 +13027,10 @@ var ReactDOMComponentTree = __webpack_require__(5);
 var ReactUpdates = __webpack_require__(10);
 var SyntheticEvent = __webpack_require__(12);
 
-var inputValueTracking = __webpack_require__(74);
+var inputValueTracking = __webpack_require__(72);
 var getEventTarget = __webpack_require__(44);
 var isEventSupported = __webpack_require__(45);
-var isTextInputElement = __webpack_require__(76);
+var isTextInputElement = __webpack_require__(74);
 
 var eventTypes = {
   change: {
@@ -13340,7 +13321,7 @@ var ChangeEventPlugin = {
 module.exports = ChangeEventPlugin;
 
 /***/ }),
-/* 113 */
+/* 111 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13359,7 +13340,7 @@ var _prodInvariant = __webpack_require__(3);
 var DOMLazyTree = __webpack_require__(16);
 var ExecutionEnvironment = __webpack_require__(6);
 
-var createNodesFromMarkup = __webpack_require__(95);
+var createNodesFromMarkup = __webpack_require__(93);
 var emptyFunction = __webpack_require__(9);
 var invariant = __webpack_require__(1);
 
@@ -13390,7 +13371,7 @@ module.exports = Danger;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 114 */
+/* 112 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13419,7 +13400,7 @@ var DefaultEventPluginOrder = ['ResponderEventPlugin', 'SimpleEventPlugin', 'Tap
 module.exports = DefaultEventPluginOrder;
 
 /***/ }),
-/* 115 */
+/* 113 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13520,7 +13501,7 @@ var EnterLeaveEventPlugin = {
 module.exports = EnterLeaveEventPlugin;
 
 /***/ }),
-/* 116 */
+/* 114 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13538,7 +13519,7 @@ var _assign = __webpack_require__(4);
 
 var PooledClass = __webpack_require__(14);
 
-var getTextContentAccessor = __webpack_require__(73);
+var getTextContentAccessor = __webpack_require__(71);
 
 /**
  * This helper class stores information about text content of a target node,
@@ -13618,7 +13599,7 @@ PooledClass.addPoolingTo(FallbackCompositionState);
 module.exports = FallbackCompositionState;
 
 /***/ }),
-/* 117 */
+/* 115 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13858,7 +13839,7 @@ var HTMLDOMPropertyConfig = {
 module.exports = HTMLDOMPropertyConfig;
 
 /***/ }),
-/* 118 */
+/* 116 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -13874,10 +13855,10 @@ module.exports = HTMLDOMPropertyConfig;
 
 var ReactReconciler = __webpack_require__(17);
 
-var instantiateReactComponent = __webpack_require__(75);
+var instantiateReactComponent = __webpack_require__(73);
 var KeyEscapeUtils = __webpack_require__(36);
 var shouldUpdateReactComponent = __webpack_require__(46);
-var traverseAllChildren = __webpack_require__(78);
+var traverseAllChildren = __webpack_require__(76);
 var warning = __webpack_require__(2);
 
 var ReactComponentTreeHook;
@@ -14015,7 +13996,7 @@ module.exports = ReactChildReconciler;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 119 */
+/* 117 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14030,7 +14011,7 @@ module.exports = ReactChildReconciler;
 
 
 var DOMChildrenOperations = __webpack_require__(33);
-var ReactDOMIDOperations = __webpack_require__(126);
+var ReactDOMIDOperations = __webpack_require__(124);
 
 /**
  * Abstracts away all functionality of the reconciler that requires knowledge of
@@ -14046,7 +14027,7 @@ var ReactComponentBrowserEnvironment = {
 module.exports = ReactComponentBrowserEnvironment;
 
 /***/ }),
-/* 120 */
+/* 118 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14069,11 +14050,11 @@ var ReactCurrentOwner = __webpack_require__(11);
 var ReactErrorUtils = __webpack_require__(39);
 var ReactInstanceMap = __webpack_require__(22);
 var ReactInstrumentation = __webpack_require__(8);
-var ReactNodeTypes = __webpack_require__(67);
+var ReactNodeTypes = __webpack_require__(65);
 var ReactReconciler = __webpack_require__(17);
 
 if (process.env.NODE_ENV !== 'production') {
-  var checkReactTypeSpec = __webpack_require__(168);
+  var checkReactTypeSpec = __webpack_require__(166);
 }
 
 var emptyObject = __webpack_require__(24);
@@ -14950,7 +14931,7 @@ module.exports = ReactCompositeComponent;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 121 */
+/* 119 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -14967,15 +14948,15 @@ module.exports = ReactCompositeComponent;
 
 
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactDefaultInjection = __webpack_require__(138);
-var ReactMount = __webpack_require__(66);
+var ReactDefaultInjection = __webpack_require__(136);
+var ReactMount = __webpack_require__(64);
 var ReactReconciler = __webpack_require__(17);
 var ReactUpdates = __webpack_require__(10);
-var ReactVersion = __webpack_require__(153);
+var ReactVersion = __webpack_require__(151);
 
-var findDOMNode = __webpack_require__(170);
-var getHostComponentFromComposite = __webpack_require__(72);
-var renderSubtreeIntoContainer = __webpack_require__(177);
+var findDOMNode = __webpack_require__(168);
+var getHostComponentFromComposite = __webpack_require__(70);
+var renderSubtreeIntoContainer = __webpack_require__(175);
 var warning = __webpack_require__(2);
 
 ReactDefaultInjection.inject();
@@ -15052,9 +15033,9 @@ if (process.env.NODE_ENV !== 'production') {
 
 if (process.env.NODE_ENV !== 'production') {
   var ReactInstrumentation = __webpack_require__(8);
-  var ReactDOMUnknownPropertyHook = __webpack_require__(135);
-  var ReactDOMNullInputValuePropHook = __webpack_require__(129);
-  var ReactDOMInvalidARIAHook = __webpack_require__(128);
+  var ReactDOMUnknownPropertyHook = __webpack_require__(133);
+  var ReactDOMNullInputValuePropHook = __webpack_require__(127);
+  var ReactDOMInvalidARIAHook = __webpack_require__(126);
 
   ReactInstrumentation.debugTool.addHook(ReactDOMUnknownPropertyHook);
   ReactInstrumentation.debugTool.addHook(ReactDOMNullInputValuePropHook);
@@ -15065,7 +15046,7 @@ module.exports = ReactDOM;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 122 */
+/* 120 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -15084,31 +15065,31 @@ module.exports = ReactDOM;
 var _prodInvariant = __webpack_require__(3),
     _assign = __webpack_require__(4);
 
-var AutoFocusUtils = __webpack_require__(109);
-var CSSPropertyOperations = __webpack_require__(111);
+var AutoFocusUtils = __webpack_require__(107);
+var CSSPropertyOperations = __webpack_require__(109);
 var DOMLazyTree = __webpack_require__(16);
 var DOMNamespaces = __webpack_require__(34);
 var DOMProperty = __webpack_require__(13);
-var DOMPropertyOperations = __webpack_require__(59);
+var DOMPropertyOperations = __webpack_require__(57);
 var EventPluginHub = __webpack_require__(20);
 var EventPluginRegistry = __webpack_require__(25);
 var ReactBrowserEventEmitter = __webpack_require__(26);
-var ReactDOMComponentFlags = __webpack_require__(60);
+var ReactDOMComponentFlags = __webpack_require__(58);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactDOMInput = __webpack_require__(127);
-var ReactDOMOption = __webpack_require__(130);
-var ReactDOMSelect = __webpack_require__(61);
-var ReactDOMTextarea = __webpack_require__(133);
+var ReactDOMInput = __webpack_require__(125);
+var ReactDOMOption = __webpack_require__(128);
+var ReactDOMSelect = __webpack_require__(59);
+var ReactDOMTextarea = __webpack_require__(131);
 var ReactInstrumentation = __webpack_require__(8);
-var ReactMultiChild = __webpack_require__(146);
-var ReactServerRenderingTransaction = __webpack_require__(151);
+var ReactMultiChild = __webpack_require__(144);
+var ReactServerRenderingTransaction = __webpack_require__(149);
 
 var emptyFunction = __webpack_require__(9);
 var escapeTextContentForBrowser = __webpack_require__(29);
 var invariant = __webpack_require__(1);
 var isEventSupported = __webpack_require__(45);
 var shallowEqual = __webpack_require__(32);
-var inputValueTracking = __webpack_require__(74);
+var inputValueTracking = __webpack_require__(72);
 var validateDOMNesting = __webpack_require__(47);
 var warning = __webpack_require__(2);
 
@@ -16083,7 +16064,7 @@ module.exports = ReactDOMComponent;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 123 */
+/* 121 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16120,7 +16101,7 @@ module.exports = ReactDOMContainerInfo;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 124 */
+/* 122 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16183,7 +16164,7 @@ _assign(ReactDOMEmptyComponent.prototype, {
 module.exports = ReactDOMEmptyComponent;
 
 /***/ }),
-/* 125 */
+/* 123 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16205,7 +16186,7 @@ var ReactDOMFeatureFlags = {
 module.exports = ReactDOMFeatureFlags;
 
 /***/ }),
-/* 126 */
+/* 124 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16241,7 +16222,7 @@ var ReactDOMIDOperations = {
 module.exports = ReactDOMIDOperations;
 
 /***/ }),
-/* 127 */
+/* 125 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16258,7 +16239,7 @@ module.exports = ReactDOMIDOperations;
 var _prodInvariant = __webpack_require__(3),
     _assign = __webpack_require__(4);
 
-var DOMPropertyOperations = __webpack_require__(59);
+var DOMPropertyOperations = __webpack_require__(57);
 var LinkedValueUtils = __webpack_require__(37);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactUpdates = __webpack_require__(10);
@@ -16532,7 +16513,7 @@ module.exports = ReactDOMInput;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 128 */
+/* 126 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16629,7 +16610,7 @@ module.exports = ReactDOMInvalidARIAHook;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 129 */
+/* 127 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16676,7 +16657,7 @@ module.exports = ReactDOMNullInputValuePropHook;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 130 */
+/* 128 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16694,7 +16675,7 @@ var _assign = __webpack_require__(4);
 
 var React = __webpack_require__(18);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactDOMSelect = __webpack_require__(61);
+var ReactDOMSelect = __webpack_require__(59);
 
 var warning = __webpack_require__(2);
 var didWarnInvalidOptionChildren = false;
@@ -16802,7 +16783,7 @@ module.exports = ReactDOMOption;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 131 */
+/* 129 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -16818,8 +16799,8 @@ module.exports = ReactDOMOption;
 
 var ExecutionEnvironment = __webpack_require__(6);
 
-var getNodeForCharacterOffset = __webpack_require__(174);
-var getTextContentAccessor = __webpack_require__(73);
+var getNodeForCharacterOffset = __webpack_require__(172);
+var getTextContentAccessor = __webpack_require__(71);
 
 /**
  * While `isCollapsed` is available on the Selection object and `collapsed`
@@ -17017,7 +16998,7 @@ var ReactDOMSelection = {
 module.exports = ReactDOMSelection;
 
 /***/ }),
-/* 132 */
+/* 130 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17183,7 +17164,7 @@ module.exports = ReactDOMTextComponent;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 133 */
+/* 131 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17347,7 +17328,7 @@ module.exports = ReactDOMTextarea;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 134 */
+/* 132 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17487,7 +17468,7 @@ module.exports = {
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 135 */
+/* 133 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17603,7 +17584,7 @@ module.exports = ReactDOMUnknownPropertyHook;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 136 */
+/* 134 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -17618,12 +17599,12 @@ module.exports = ReactDOMUnknownPropertyHook;
 
 
 
-var ReactInvalidSetStateWarningHook = __webpack_require__(144);
-var ReactHostOperationHistoryHook = __webpack_require__(142);
+var ReactInvalidSetStateWarningHook = __webpack_require__(142);
+var ReactHostOperationHistoryHook = __webpack_require__(140);
 var ReactComponentTreeHook = __webpack_require__(7);
 var ExecutionEnvironment = __webpack_require__(6);
 
-var performanceNow = __webpack_require__(104);
+var performanceNow = __webpack_require__(102);
 var warning = __webpack_require__(2);
 
 var hooks = [];
@@ -17968,7 +17949,7 @@ module.exports = ReactDebugTool;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 137 */
+/* 135 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18039,7 +18020,7 @@ var ReactDefaultBatchingStrategy = {
 module.exports = ReactDefaultBatchingStrategy;
 
 /***/ }),
-/* 138 */
+/* 136 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18053,25 +18034,25 @@ module.exports = ReactDefaultBatchingStrategy;
 
 
 
-var ARIADOMPropertyConfig = __webpack_require__(108);
-var BeforeInputEventPlugin = __webpack_require__(110);
-var ChangeEventPlugin = __webpack_require__(112);
-var DefaultEventPluginOrder = __webpack_require__(114);
-var EnterLeaveEventPlugin = __webpack_require__(115);
-var HTMLDOMPropertyConfig = __webpack_require__(117);
-var ReactComponentBrowserEnvironment = __webpack_require__(119);
-var ReactDOMComponent = __webpack_require__(122);
+var ARIADOMPropertyConfig = __webpack_require__(106);
+var BeforeInputEventPlugin = __webpack_require__(108);
+var ChangeEventPlugin = __webpack_require__(110);
+var DefaultEventPluginOrder = __webpack_require__(112);
+var EnterLeaveEventPlugin = __webpack_require__(113);
+var HTMLDOMPropertyConfig = __webpack_require__(115);
+var ReactComponentBrowserEnvironment = __webpack_require__(117);
+var ReactDOMComponent = __webpack_require__(120);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactDOMEmptyComponent = __webpack_require__(124);
-var ReactDOMTreeTraversal = __webpack_require__(134);
-var ReactDOMTextComponent = __webpack_require__(132);
-var ReactDefaultBatchingStrategy = __webpack_require__(137);
-var ReactEventListener = __webpack_require__(141);
-var ReactInjection = __webpack_require__(143);
-var ReactReconcileTransaction = __webpack_require__(149);
-var SVGDOMPropertyConfig = __webpack_require__(154);
-var SelectEventPlugin = __webpack_require__(155);
-var SimpleEventPlugin = __webpack_require__(156);
+var ReactDOMEmptyComponent = __webpack_require__(122);
+var ReactDOMTreeTraversal = __webpack_require__(132);
+var ReactDOMTextComponent = __webpack_require__(130);
+var ReactDefaultBatchingStrategy = __webpack_require__(135);
+var ReactEventListener = __webpack_require__(139);
+var ReactInjection = __webpack_require__(141);
+var ReactReconcileTransaction = __webpack_require__(147);
+var SVGDOMPropertyConfig = __webpack_require__(152);
+var SelectEventPlugin = __webpack_require__(153);
+var SimpleEventPlugin = __webpack_require__(154);
 
 var alreadyInjected = false;
 
@@ -18128,7 +18109,7 @@ module.exports = {
 };
 
 /***/ }),
-/* 139 */
+/* 137 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18151,7 +18132,7 @@ var REACT_ELEMENT_TYPE = typeof Symbol === 'function' && Symbol['for'] && Symbol
 module.exports = REACT_ELEMENT_TYPE;
 
 /***/ }),
-/* 140 */
+/* 138 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18186,7 +18167,7 @@ var ReactEventEmitterMixin = {
 module.exports = ReactEventEmitterMixin;
 
 /***/ }),
-/* 141 */
+/* 139 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18202,14 +18183,14 @@ module.exports = ReactEventEmitterMixin;
 
 var _assign = __webpack_require__(4);
 
-var EventListener = __webpack_require__(49);
+var EventListener = __webpack_require__(50);
 var ExecutionEnvironment = __webpack_require__(6);
 var PooledClass = __webpack_require__(14);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactUpdates = __webpack_require__(10);
 
 var getEventTarget = __webpack_require__(44);
-var getUnboundedScrollPosition = __webpack_require__(97);
+var getUnboundedScrollPosition = __webpack_require__(95);
 
 /**
  * Find the deepest React component completely containing the root of the
@@ -18344,7 +18325,7 @@ var ReactEventListener = {
 module.exports = ReactEventListener;
 
 /***/ }),
-/* 142 */
+/* 140 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18381,7 +18362,7 @@ var ReactHostOperationHistoryHook = {
 module.exports = ReactHostOperationHistoryHook;
 
 /***/ }),
-/* 143 */
+/* 141 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18399,9 +18380,9 @@ var DOMProperty = __webpack_require__(13);
 var EventPluginHub = __webpack_require__(20);
 var EventPluginUtils = __webpack_require__(35);
 var ReactComponentEnvironment = __webpack_require__(38);
-var ReactEmptyComponent = __webpack_require__(62);
+var ReactEmptyComponent = __webpack_require__(60);
 var ReactBrowserEventEmitter = __webpack_require__(26);
-var ReactHostComponent = __webpack_require__(64);
+var ReactHostComponent = __webpack_require__(62);
 var ReactUpdates = __webpack_require__(10);
 
 var ReactInjection = {
@@ -18418,7 +18399,7 @@ var ReactInjection = {
 module.exports = ReactInjection;
 
 /***/ }),
-/* 144 */
+/* 142 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18459,7 +18440,7 @@ module.exports = ReactInvalidSetStateWarningHook;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 145 */
+/* 143 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18473,7 +18454,7 @@ module.exports = ReactInvalidSetStateWarningHook;
 
 
 
-var adler32 = __webpack_require__(167);
+var adler32 = __webpack_require__(165);
 
 var TAG_END = /\/?>/;
 var COMMENT_START = /^<\!\-\-/;
@@ -18512,7 +18493,7 @@ var ReactMarkupChecksum = {
 module.exports = ReactMarkupChecksum;
 
 /***/ }),
-/* 146 */
+/* 144 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -18534,10 +18515,10 @@ var ReactInstrumentation = __webpack_require__(8);
 
 var ReactCurrentOwner = __webpack_require__(11);
 var ReactReconciler = __webpack_require__(17);
-var ReactChildReconciler = __webpack_require__(118);
+var ReactChildReconciler = __webpack_require__(116);
 
 var emptyFunction = __webpack_require__(9);
-var flattenChildren = __webpack_require__(171);
+var flattenChildren = __webpack_require__(169);
 var invariant = __webpack_require__(1);
 
 /**
@@ -18962,7 +18943,7 @@ module.exports = ReactMultiChild;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 147 */
+/* 145 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19059,7 +19040,7 @@ module.exports = ReactOwner;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 148 */
+/* 146 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19088,7 +19069,7 @@ module.exports = ReactPropTypeLocationNames;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 149 */
+/* 147 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19104,10 +19085,10 @@ module.exports = ReactPropTypeLocationNames;
 
 var _assign = __webpack_require__(4);
 
-var CallbackQueue = __webpack_require__(58);
+var CallbackQueue = __webpack_require__(56);
 var PooledClass = __webpack_require__(14);
 var ReactBrowserEventEmitter = __webpack_require__(26);
-var ReactInputSelection = __webpack_require__(65);
+var ReactInputSelection = __webpack_require__(63);
 var ReactInstrumentation = __webpack_require__(8);
 var Transaction = __webpack_require__(28);
 var ReactUpdateQueue = __webpack_require__(40);
@@ -19270,7 +19251,7 @@ module.exports = ReactReconcileTransaction;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 150 */
+/* 148 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19285,7 +19266,7 @@ module.exports = ReactReconcileTransaction;
 
 
 
-var ReactOwner = __webpack_require__(147);
+var ReactOwner = __webpack_require__(145);
 
 var ReactRef = {};
 
@@ -19362,7 +19343,7 @@ ReactRef.detachRefs = function (instance, element) {
 module.exports = ReactRef;
 
 /***/ }),
-/* 151 */
+/* 149 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19381,7 +19362,7 @@ var _assign = __webpack_require__(4);
 var PooledClass = __webpack_require__(14);
 var Transaction = __webpack_require__(28);
 var ReactInstrumentation = __webpack_require__(8);
-var ReactServerUpdateQueue = __webpack_require__(152);
+var ReactServerUpdateQueue = __webpack_require__(150);
 
 /**
  * Executed within the scope of the `Transaction` instance. Consider these as
@@ -19456,7 +19437,7 @@ module.exports = ReactServerRenderingTransaction;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 152 */
+/* 150 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19599,7 +19580,7 @@ module.exports = ReactServerUpdateQueue;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 153 */
+/* 151 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19616,7 +19597,7 @@ module.exports = ReactServerUpdateQueue;
 module.exports = '15.6.2';
 
 /***/ }),
-/* 154 */
+/* 152 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19921,7 +19902,7 @@ Object.keys(ATTRS).forEach(function (key) {
 module.exports = SVGDOMPropertyConfig;
 
 /***/ }),
-/* 155 */
+/* 153 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -19938,11 +19919,11 @@ module.exports = SVGDOMPropertyConfig;
 var EventPropagators = __webpack_require__(21);
 var ExecutionEnvironment = __webpack_require__(6);
 var ReactDOMComponentTree = __webpack_require__(5);
-var ReactInputSelection = __webpack_require__(65);
+var ReactInputSelection = __webpack_require__(63);
 var SyntheticEvent = __webpack_require__(12);
 
-var getActiveElement = __webpack_require__(51);
-var isTextInputElement = __webpack_require__(76);
+var getActiveElement = __webpack_require__(52);
+var isTextInputElement = __webpack_require__(74);
 var shallowEqual = __webpack_require__(32);
 
 var skipSelectionChangeEvent = ExecutionEnvironment.canUseDOM && 'documentMode' in document && document.documentMode <= 11;
@@ -20112,7 +20093,7 @@ var SelectEventPlugin = {
 module.exports = SelectEventPlugin;
 
 /***/ }),
-/* 156 */
+/* 154 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20129,20 +20110,20 @@ module.exports = SelectEventPlugin;
 
 var _prodInvariant = __webpack_require__(3);
 
-var EventListener = __webpack_require__(49);
+var EventListener = __webpack_require__(50);
 var EventPropagators = __webpack_require__(21);
 var ReactDOMComponentTree = __webpack_require__(5);
-var SyntheticAnimationEvent = __webpack_require__(157);
-var SyntheticClipboardEvent = __webpack_require__(158);
+var SyntheticAnimationEvent = __webpack_require__(155);
+var SyntheticClipboardEvent = __webpack_require__(156);
 var SyntheticEvent = __webpack_require__(12);
-var SyntheticFocusEvent = __webpack_require__(161);
-var SyntheticKeyboardEvent = __webpack_require__(163);
+var SyntheticFocusEvent = __webpack_require__(159);
+var SyntheticKeyboardEvent = __webpack_require__(161);
 var SyntheticMouseEvent = __webpack_require__(27);
-var SyntheticDragEvent = __webpack_require__(160);
-var SyntheticTouchEvent = __webpack_require__(164);
-var SyntheticTransitionEvent = __webpack_require__(165);
+var SyntheticDragEvent = __webpack_require__(158);
+var SyntheticTouchEvent = __webpack_require__(162);
+var SyntheticTransitionEvent = __webpack_require__(163);
 var SyntheticUIEvent = __webpack_require__(23);
-var SyntheticWheelEvent = __webpack_require__(166);
+var SyntheticWheelEvent = __webpack_require__(164);
 
 var emptyFunction = __webpack_require__(9);
 var getEventCharCode = __webpack_require__(42);
@@ -20342,7 +20323,7 @@ module.exports = SimpleEventPlugin;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 157 */
+/* 155 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20384,7 +20365,7 @@ SyntheticEvent.augmentClass(SyntheticAnimationEvent, AnimationEventInterface);
 module.exports = SyntheticAnimationEvent;
 
 /***/ }),
-/* 158 */
+/* 156 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20425,7 +20406,7 @@ SyntheticEvent.augmentClass(SyntheticClipboardEvent, ClipboardEventInterface);
 module.exports = SyntheticClipboardEvent;
 
 /***/ }),
-/* 159 */
+/* 157 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20464,7 +20445,7 @@ SyntheticEvent.augmentClass(SyntheticCompositionEvent, CompositionEventInterface
 module.exports = SyntheticCompositionEvent;
 
 /***/ }),
-/* 160 */
+/* 158 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20503,7 +20484,7 @@ SyntheticMouseEvent.augmentClass(SyntheticDragEvent, DragEventInterface);
 module.exports = SyntheticDragEvent;
 
 /***/ }),
-/* 161 */
+/* 159 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20542,7 +20523,7 @@ SyntheticUIEvent.augmentClass(SyntheticFocusEvent, FocusEventInterface);
 module.exports = SyntheticFocusEvent;
 
 /***/ }),
-/* 162 */
+/* 160 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20582,7 +20563,7 @@ SyntheticEvent.augmentClass(SyntheticInputEvent, InputEventInterface);
 module.exports = SyntheticInputEvent;
 
 /***/ }),
-/* 163 */
+/* 161 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20599,7 +20580,7 @@ module.exports = SyntheticInputEvent;
 var SyntheticUIEvent = __webpack_require__(23);
 
 var getEventCharCode = __webpack_require__(42);
-var getEventKey = __webpack_require__(172);
+var getEventKey = __webpack_require__(170);
 var getEventModifierState = __webpack_require__(43);
 
 /**
@@ -20669,7 +20650,7 @@ SyntheticUIEvent.augmentClass(SyntheticKeyboardEvent, KeyboardEventInterface);
 module.exports = SyntheticKeyboardEvent;
 
 /***/ }),
-/* 164 */
+/* 162 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20717,7 +20698,7 @@ SyntheticUIEvent.augmentClass(SyntheticTouchEvent, TouchEventInterface);
 module.exports = SyntheticTouchEvent;
 
 /***/ }),
-/* 165 */
+/* 163 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20759,7 +20740,7 @@ SyntheticEvent.augmentClass(SyntheticTransitionEvent, TransitionEventInterface);
 module.exports = SyntheticTransitionEvent;
 
 /***/ }),
-/* 166 */
+/* 164 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20813,7 +20794,7 @@ SyntheticMouseEvent.augmentClass(SyntheticWheelEvent, WheelEventInterface);
 module.exports = SyntheticWheelEvent;
 
 /***/ }),
-/* 167 */
+/* 165 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20860,7 +20841,7 @@ function adler32(data) {
 module.exports = adler32;
 
 /***/ }),
-/* 168 */
+/* 166 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20876,8 +20857,8 @@ module.exports = adler32;
 
 var _prodInvariant = __webpack_require__(3);
 
-var ReactPropTypeLocationNames = __webpack_require__(148);
-var ReactPropTypesSecret = __webpack_require__(68);
+var ReactPropTypeLocationNames = __webpack_require__(146);
+var ReactPropTypesSecret = __webpack_require__(66);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
@@ -20951,7 +20932,7 @@ module.exports = checkReactTypeSpec;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 169 */
+/* 167 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -20965,7 +20946,7 @@ module.exports = checkReactTypeSpec;
 
 
 
-var CSSProperty = __webpack_require__(57);
+var CSSProperty = __webpack_require__(55);
 var warning = __webpack_require__(2);
 
 var isUnitlessNumber = CSSProperty.isUnitlessNumber;
@@ -21034,7 +21015,7 @@ module.exports = dangerousStyleValue;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 170 */
+/* 168 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21054,7 +21035,7 @@ var ReactCurrentOwner = __webpack_require__(11);
 var ReactDOMComponentTree = __webpack_require__(5);
 var ReactInstanceMap = __webpack_require__(22);
 
-var getHostComponentFromComposite = __webpack_require__(72);
+var getHostComponentFromComposite = __webpack_require__(70);
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
 
@@ -21098,7 +21079,7 @@ module.exports = findDOMNode;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 171 */
+/* 169 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21114,7 +21095,7 @@ module.exports = findDOMNode;
 
 
 var KeyEscapeUtils = __webpack_require__(36);
-var traverseAllChildren = __webpack_require__(78);
+var traverseAllChildren = __webpack_require__(76);
 var warning = __webpack_require__(2);
 
 var ReactComponentTreeHook;
@@ -21178,7 +21159,7 @@ module.exports = flattenChildren;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 172 */
+/* 170 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21293,7 +21274,7 @@ function getEventKey(nativeEvent) {
 module.exports = getEventKey;
 
 /***/ }),
-/* 173 */
+/* 171 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21337,7 +21318,7 @@ function getIteratorFn(maybeIterable) {
 module.exports = getIteratorFn;
 
 /***/ }),
-/* 174 */
+/* 172 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21414,7 +21395,7 @@ function getNodeForCharacterOffset(root, offset) {
 module.exports = getNodeForCharacterOffset;
 
 /***/ }),
-/* 175 */
+/* 173 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21518,7 +21499,7 @@ function getVendorPrefixedEventName(eventName) {
 module.exports = getVendorPrefixedEventName;
 
 /***/ }),
-/* 176 */
+/* 174 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21547,7 +21528,7 @@ function quoteAttributeValueForBrowser(value) {
 module.exports = quoteAttributeValueForBrowser;
 
 /***/ }),
-/* 177 */
+/* 175 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21561,12 +21542,289 @@ module.exports = quoteAttributeValueForBrowser;
 
 
 
-var ReactMount = __webpack_require__(66);
+var ReactMount = __webpack_require__(64);
 
 module.exports = ReactMount.renderSubtreeIntoContainer;
 
 /***/ }),
+/* 176 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {/** @license React v16.9.0
+ * react-is.development.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+
+
+
+
+if (process.env.NODE_ENV !== "production") {
+  (function() {
+'use strict';
+
+Object.defineProperty(exports, '__esModule', { value: true });
+
+// The Symbol used to tag the ReactElement-like types. If there is no native Symbol
+// nor polyfill, then a plain number is used for performance.
+var hasSymbol = typeof Symbol === 'function' && Symbol.for;
+
+var REACT_ELEMENT_TYPE = hasSymbol ? Symbol.for('react.element') : 0xeac7;
+var REACT_PORTAL_TYPE = hasSymbol ? Symbol.for('react.portal') : 0xeaca;
+var REACT_FRAGMENT_TYPE = hasSymbol ? Symbol.for('react.fragment') : 0xeacb;
+var REACT_STRICT_MODE_TYPE = hasSymbol ? Symbol.for('react.strict_mode') : 0xeacc;
+var REACT_PROFILER_TYPE = hasSymbol ? Symbol.for('react.profiler') : 0xead2;
+var REACT_PROVIDER_TYPE = hasSymbol ? Symbol.for('react.provider') : 0xeacd;
+var REACT_CONTEXT_TYPE = hasSymbol ? Symbol.for('react.context') : 0xeace;
+// TODO: We don't use AsyncMode or ConcurrentMode anymore. They were temporary
+// (unstable) APIs that have been removed. Can we remove the symbols?
+var REACT_ASYNC_MODE_TYPE = hasSymbol ? Symbol.for('react.async_mode') : 0xeacf;
+var REACT_CONCURRENT_MODE_TYPE = hasSymbol ? Symbol.for('react.concurrent_mode') : 0xeacf;
+var REACT_FORWARD_REF_TYPE = hasSymbol ? Symbol.for('react.forward_ref') : 0xead0;
+var REACT_SUSPENSE_TYPE = hasSymbol ? Symbol.for('react.suspense') : 0xead1;
+var REACT_SUSPENSE_LIST_TYPE = hasSymbol ? Symbol.for('react.suspense_list') : 0xead8;
+var REACT_MEMO_TYPE = hasSymbol ? Symbol.for('react.memo') : 0xead3;
+var REACT_LAZY_TYPE = hasSymbol ? Symbol.for('react.lazy') : 0xead4;
+var REACT_FUNDAMENTAL_TYPE = hasSymbol ? Symbol.for('react.fundamental') : 0xead5;
+var REACT_RESPONDER_TYPE = hasSymbol ? Symbol.for('react.responder') : 0xead6;
+
+function isValidElementType(type) {
+  return typeof type === 'string' || typeof type === 'function' ||
+  // Note: its typeof might be other than 'symbol' or 'number' if it's a polyfill.
+  type === REACT_FRAGMENT_TYPE || type === REACT_CONCURRENT_MODE_TYPE || type === REACT_PROFILER_TYPE || type === REACT_STRICT_MODE_TYPE || type === REACT_SUSPENSE_TYPE || type === REACT_SUSPENSE_LIST_TYPE || typeof type === 'object' && type !== null && (type.$$typeof === REACT_LAZY_TYPE || type.$$typeof === REACT_MEMO_TYPE || type.$$typeof === REACT_PROVIDER_TYPE || type.$$typeof === REACT_CONTEXT_TYPE || type.$$typeof === REACT_FORWARD_REF_TYPE || type.$$typeof === REACT_FUNDAMENTAL_TYPE || type.$$typeof === REACT_RESPONDER_TYPE);
+}
+
+/**
+ * Forked from fbjs/warning:
+ * https://github.com/facebook/fbjs/blob/e66ba20ad5be433eb54423f2b097d829324d9de6/packages/fbjs/src/__forks__/warning.js
+ *
+ * Only change is we use console.warn instead of console.error,
+ * and do nothing when 'console' is not supported.
+ * This really simplifies the code.
+ * ---
+ * Similar to invariant but only logs a warning if the condition is not met.
+ * This can be used to log issues in development environments in critical
+ * paths. Removing the logging code for production environments will keep the
+ * same logic and follow the same code paths.
+ */
+
+var lowPriorityWarning = function () {};
+
+{
+  var printWarning = function (format) {
+    for (var _len = arguments.length, args = Array(_len > 1 ? _len - 1 : 0), _key = 1; _key < _len; _key++) {
+      args[_key - 1] = arguments[_key];
+    }
+
+    var argIndex = 0;
+    var message = 'Warning: ' + format.replace(/%s/g, function () {
+      return args[argIndex++];
+    });
+    if (typeof console !== 'undefined') {
+      console.warn(message);
+    }
+    try {
+      // --- Welcome to debugging React ---
+      // This error was thrown as a convenience so that you can use this stack
+      // to find the callsite that caused this warning to fire.
+      throw new Error(message);
+    } catch (x) {}
+  };
+
+  lowPriorityWarning = function (condition, format) {
+    if (format === undefined) {
+      throw new Error('`lowPriorityWarning(condition, format, ...args)` requires a warning ' + 'message argument');
+    }
+    if (!condition) {
+      for (var _len2 = arguments.length, args = Array(_len2 > 2 ? _len2 - 2 : 0), _key2 = 2; _key2 < _len2; _key2++) {
+        args[_key2 - 2] = arguments[_key2];
+      }
+
+      printWarning.apply(undefined, [format].concat(args));
+    }
+  };
+}
+
+var lowPriorityWarning$1 = lowPriorityWarning;
+
+function typeOf(object) {
+  if (typeof object === 'object' && object !== null) {
+    var $$typeof = object.$$typeof;
+    switch ($$typeof) {
+      case REACT_ELEMENT_TYPE:
+        var type = object.type;
+
+        switch (type) {
+          case REACT_ASYNC_MODE_TYPE:
+          case REACT_CONCURRENT_MODE_TYPE:
+          case REACT_FRAGMENT_TYPE:
+          case REACT_PROFILER_TYPE:
+          case REACT_STRICT_MODE_TYPE:
+          case REACT_SUSPENSE_TYPE:
+            return type;
+          default:
+            var $$typeofType = type && type.$$typeof;
+
+            switch ($$typeofType) {
+              case REACT_CONTEXT_TYPE:
+              case REACT_FORWARD_REF_TYPE:
+              case REACT_PROVIDER_TYPE:
+                return $$typeofType;
+              default:
+                return $$typeof;
+            }
+        }
+      case REACT_LAZY_TYPE:
+      case REACT_MEMO_TYPE:
+      case REACT_PORTAL_TYPE:
+        return $$typeof;
+    }
+  }
+
+  return undefined;
+}
+
+// AsyncMode is deprecated along with isAsyncMode
+var AsyncMode = REACT_ASYNC_MODE_TYPE;
+var ConcurrentMode = REACT_CONCURRENT_MODE_TYPE;
+var ContextConsumer = REACT_CONTEXT_TYPE;
+var ContextProvider = REACT_PROVIDER_TYPE;
+var Element = REACT_ELEMENT_TYPE;
+var ForwardRef = REACT_FORWARD_REF_TYPE;
+var Fragment = REACT_FRAGMENT_TYPE;
+var Lazy = REACT_LAZY_TYPE;
+var Memo = REACT_MEMO_TYPE;
+var Portal = REACT_PORTAL_TYPE;
+var Profiler = REACT_PROFILER_TYPE;
+var StrictMode = REACT_STRICT_MODE_TYPE;
+var Suspense = REACT_SUSPENSE_TYPE;
+
+var hasWarnedAboutDeprecatedIsAsyncMode = false;
+
+// AsyncMode should be deprecated
+function isAsyncMode(object) {
+  {
+    if (!hasWarnedAboutDeprecatedIsAsyncMode) {
+      hasWarnedAboutDeprecatedIsAsyncMode = true;
+      lowPriorityWarning$1(false, 'The ReactIs.isAsyncMode() alias has been deprecated, ' + 'and will be removed in React 17+. Update your code to use ' + 'ReactIs.isConcurrentMode() instead. It has the exact same API.');
+    }
+  }
+  return isConcurrentMode(object) || typeOf(object) === REACT_ASYNC_MODE_TYPE;
+}
+function isConcurrentMode(object) {
+  return typeOf(object) === REACT_CONCURRENT_MODE_TYPE;
+}
+function isContextConsumer(object) {
+  return typeOf(object) === REACT_CONTEXT_TYPE;
+}
+function isContextProvider(object) {
+  return typeOf(object) === REACT_PROVIDER_TYPE;
+}
+function isElement(object) {
+  return typeof object === 'object' && object !== null && object.$$typeof === REACT_ELEMENT_TYPE;
+}
+function isForwardRef(object) {
+  return typeOf(object) === REACT_FORWARD_REF_TYPE;
+}
+function isFragment(object) {
+  return typeOf(object) === REACT_FRAGMENT_TYPE;
+}
+function isLazy(object) {
+  return typeOf(object) === REACT_LAZY_TYPE;
+}
+function isMemo(object) {
+  return typeOf(object) === REACT_MEMO_TYPE;
+}
+function isPortal(object) {
+  return typeOf(object) === REACT_PORTAL_TYPE;
+}
+function isProfiler(object) {
+  return typeOf(object) === REACT_PROFILER_TYPE;
+}
+function isStrictMode(object) {
+  return typeOf(object) === REACT_STRICT_MODE_TYPE;
+}
+function isSuspense(object) {
+  return typeOf(object) === REACT_SUSPENSE_TYPE;
+}
+
+exports.typeOf = typeOf;
+exports.AsyncMode = AsyncMode;
+exports.ConcurrentMode = ConcurrentMode;
+exports.ContextConsumer = ContextConsumer;
+exports.ContextProvider = ContextProvider;
+exports.Element = Element;
+exports.ForwardRef = ForwardRef;
+exports.Fragment = Fragment;
+exports.Lazy = Lazy;
+exports.Memo = Memo;
+exports.Portal = Portal;
+exports.Profiler = Profiler;
+exports.StrictMode = StrictMode;
+exports.Suspense = Suspense;
+exports.isValidElementType = isValidElementType;
+exports.isAsyncMode = isAsyncMode;
+exports.isConcurrentMode = isConcurrentMode;
+exports.isContextConsumer = isContextConsumer;
+exports.isContextProvider = isContextProvider;
+exports.isElement = isElement;
+exports.isForwardRef = isForwardRef;
+exports.isFragment = isFragment;
+exports.isLazy = isLazy;
+exports.isMemo = isMemo;
+exports.isPortal = isPortal;
+exports.isProfiler = isProfiler;
+exports.isStrictMode = isStrictMode;
+exports.isSuspense = isSuspense;
+  })();
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 177 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/** @license React v16.9.0
+ * react-is.production.min.js
+ *
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+Object.defineProperty(exports,"__esModule",{value:!0});
+var b="function"===typeof Symbol&&Symbol.for,c=b?Symbol.for("react.element"):60103,d=b?Symbol.for("react.portal"):60106,e=b?Symbol.for("react.fragment"):60107,f=b?Symbol.for("react.strict_mode"):60108,g=b?Symbol.for("react.profiler"):60114,h=b?Symbol.for("react.provider"):60109,k=b?Symbol.for("react.context"):60110,l=b?Symbol.for("react.async_mode"):60111,m=b?Symbol.for("react.concurrent_mode"):60111,n=b?Symbol.for("react.forward_ref"):60112,p=b?Symbol.for("react.suspense"):60113,q=b?Symbol.for("react.suspense_list"):
+60120,r=b?Symbol.for("react.memo"):60115,t=b?Symbol.for("react.lazy"):60116,v=b?Symbol.for("react.fundamental"):60117,w=b?Symbol.for("react.responder"):60118;function x(a){if("object"===typeof a&&null!==a){var u=a.$$typeof;switch(u){case c:switch(a=a.type,a){case l:case m:case e:case g:case f:case p:return a;default:switch(a=a&&a.$$typeof,a){case k:case n:case h:return a;default:return u}}case t:case r:case d:return u}}}function y(a){return x(a)===m}exports.typeOf=x;exports.AsyncMode=l;
+exports.ConcurrentMode=m;exports.ContextConsumer=k;exports.ContextProvider=h;exports.Element=c;exports.ForwardRef=n;exports.Fragment=e;exports.Lazy=t;exports.Memo=r;exports.Portal=d;exports.Profiler=g;exports.StrictMode=f;exports.Suspense=p;
+exports.isValidElementType=function(a){return"string"===typeof a||"function"===typeof a||a===e||a===m||a===g||a===f||a===p||a===q||"object"===typeof a&&null!==a&&(a.$$typeof===t||a.$$typeof===r||a.$$typeof===h||a.$$typeof===k||a.$$typeof===n||a.$$typeof===v||a.$$typeof===w)};exports.isAsyncMode=function(a){return y(a)||x(a)===l};exports.isConcurrentMode=y;exports.isContextConsumer=function(a){return x(a)===k};exports.isContextProvider=function(a){return x(a)===h};
+exports.isElement=function(a){return"object"===typeof a&&null!==a&&a.$$typeof===c};exports.isForwardRef=function(a){return x(a)===n};exports.isFragment=function(a){return x(a)===e};exports.isLazy=function(a){return x(a)===t};exports.isMemo=function(a){return x(a)===r};exports.isPortal=function(a){return x(a)===d};exports.isProfiler=function(a){return x(a)===g};exports.isStrictMode=function(a){return x(a)===f};exports.isSuspense=function(a){return x(a)===p};
+
+
+/***/ }),
 /* 178 */
+/***/ (function(module, exports, __webpack_require__) {
+
+"use strict";
+/* WEBPACK VAR INJECTION */(function(process) {
+
+if (process.env.NODE_ENV === 'production') {
+  module.exports = __webpack_require__(177);
+} else {
+  module.exports = __webpack_require__(176);
+}
+
+/* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
+
+/***/ }),
+/* 179 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21628,7 +21886,7 @@ var KeyEscapeUtils = {
 module.exports = KeyEscapeUtils;
 
 /***/ }),
-/* 179 */
+/* 180 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21744,7 +22002,7 @@ module.exports = PooledClass;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 180 */
+/* 181 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21758,11 +22016,11 @@ module.exports = PooledClass;
 
 
 
-var PooledClass = __webpack_require__(179);
+var PooledClass = __webpack_require__(180);
 var ReactElement = __webpack_require__(15);
 
 var emptyFunction = __webpack_require__(9);
-var traverseAllChildren = __webpack_require__(190);
+var traverseAllChildren = __webpack_require__(191);
 
 var twoArgumentPooler = PooledClass.twoArgumentPooler;
 var fourArgumentPooler = PooledClass.fourArgumentPooler;
@@ -21938,7 +22196,7 @@ var ReactChildren = {
 module.exports = ReactChildren;
 
 /***/ }),
-/* 181 */
+/* 182 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -21961,7 +22219,7 @@ var ReactElement = __webpack_require__(15);
  */
 var createDOMFactory = ReactElement.createFactory;
 if (process.env.NODE_ENV !== 'production') {
-  var ReactElementValidator = __webpack_require__(81);
+  var ReactElementValidator = __webpack_require__(79);
   createDOMFactory = ReactElementValidator.createFactory;
 }
 
@@ -22111,7 +22369,7 @@ module.exports = ReactDOMFactories;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 182 */
+/* 183 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22140,7 +22398,7 @@ module.exports = ReactPropTypeLocationNames;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 183 */
+/* 184 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22157,12 +22415,12 @@ module.exports = ReactPropTypeLocationNames;
 var _require = __webpack_require__(15),
     isValidElement = _require.isValidElement;
 
-var factory = __webpack_require__(52);
+var factory = __webpack_require__(53);
 
 module.exports = factory(isValidElement);
 
 /***/ }),
-/* 184 */
+/* 185 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22182,7 +22440,7 @@ var ReactPropTypesSecret = 'SECRET_DO_NOT_PASS_THIS_OR_YOU_WILL_BE_FIRED';
 module.exports = ReactPropTypesSecret;
 
 /***/ }),
-/* 185 */
+/* 186 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22199,7 +22457,7 @@ module.exports = ReactPropTypesSecret;
 module.exports = '15.6.2';
 
 /***/ }),
-/* 186 */
+/* 187 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22215,8 +22473,8 @@ module.exports = '15.6.2';
 
 var _prodInvariant = __webpack_require__(19);
 
-var ReactPropTypeLocationNames = __webpack_require__(182);
-var ReactPropTypesSecret = __webpack_require__(184);
+var ReactPropTypeLocationNames = __webpack_require__(183);
+var ReactPropTypesSecret = __webpack_require__(185);
 
 var invariant = __webpack_require__(1);
 var warning = __webpack_require__(2);
@@ -22290,7 +22548,7 @@ module.exports = checkReactTypeSpec;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 187 */
+/* 188 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22304,19 +22562,19 @@ module.exports = checkReactTypeSpec;
 
 
 
-var _require = __webpack_require__(79),
+var _require = __webpack_require__(77),
     Component = _require.Component;
 
 var _require2 = __webpack_require__(15),
     isValidElement = _require2.isValidElement;
 
-var ReactNoopUpdateQueue = __webpack_require__(82);
-var factory = __webpack_require__(88);
+var ReactNoopUpdateQueue = __webpack_require__(80);
+var factory = __webpack_require__(86);
 
 module.exports = factory(Component, isValidElement, ReactNoopUpdateQueue);
 
 /***/ }),
-/* 188 */
+/* 189 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22340,7 +22598,7 @@ function getNextDebugID() {
 module.exports = getNextDebugID;
 
 /***/ }),
-/* 189 */
+/* 190 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22382,7 +22640,7 @@ module.exports = onlyChild;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 190 */
+/* 191 */
 /***/ (function(module, exports, __webpack_require__) {
 
 "use strict";
@@ -22399,11 +22657,11 @@ module.exports = onlyChild;
 var _prodInvariant = __webpack_require__(19);
 
 var ReactCurrentOwner = __webpack_require__(11);
-var REACT_ELEMENT_TYPE = __webpack_require__(80);
+var REACT_ELEMENT_TYPE = __webpack_require__(78);
 
-var getIteratorFn = __webpack_require__(83);
+var getIteratorFn = __webpack_require__(81);
 var invariant = __webpack_require__(1);
-var KeyEscapeUtils = __webpack_require__(178);
+var KeyEscapeUtils = __webpack_require__(179);
 var warning = __webpack_require__(2);
 
 var SEPARATOR = '.';
@@ -22562,7 +22820,7 @@ module.exports = traverseAllChildren;
 /* WEBPACK VAR INJECTION */}.call(exports, __webpack_require__(0)))
 
 /***/ }),
-/* 191 */
+/* 192 */
 /***/ (function(module, exports, __webpack_require__) {
 
 /*
@@ -22599,7 +22857,7 @@ var stylesInDom = {},
 	singletonElement = null,
 	singletonCounter = 0,
 	styleElementsInsertedAtTop = [],
-	fixUrls = __webpack_require__(192);
+	fixUrls = __webpack_require__(193);
 
 module.exports = function(list, options) {
 	if(typeof DEBUG !== "undefined" && DEBUG) {
@@ -22858,7 +23116,7 @@ function updateLink(linkElement, options, obj) {
 
 
 /***/ }),
-/* 192 */
+/* 193 */
 /***/ (function(module, exports) {
 
 
@@ -22953,16 +23211,16 @@ module.exports = function (css) {
 
 
 /***/ }),
-/* 193 */
+/* 194 */
 /***/ (function(module, exports, __webpack_require__) {
 
 // style-loader: Adds some css to the DOM by adding a <style> tag
 
 // load the styles
-var content = __webpack_require__(89);
+var content = __webpack_require__(87);
 if(typeof content === 'string') content = [[module.i, content, '']];
 // add the styles to the DOM
-var update = __webpack_require__(191)(content, {});
+var update = __webpack_require__(192)(content, {});
 if(content.locals) module.exports = content.locals;
 // Hot Module Replacement
 if(false) {
@@ -22979,10 +23237,10 @@ if(false) {
 }
 
 /***/ }),
-/* 194 */
+/* 195 */
 /***/ (function(module, exports, __webpack_require__) {
 
-module.exports = __webpack_require__(85);
+module.exports = __webpack_require__(82);
 
 
 /***/ })
