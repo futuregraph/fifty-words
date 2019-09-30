@@ -1,16 +1,8 @@
 import React, {Component} from 'react'
-import {getWordsList} from './words'
+import {WordsList} from './words'
+import {getWordsList} from './wordsDB'
 import Donation from './donate.jsx'
-
-const Word = ({word}) => <span className="words-list__item">{word}</span>
-const WordsList = ({words, onClick}) => (<div className="words-list" onClick={onClick}>
-    {
-        words.map((word, i) =>
-            (<span><Word word={word}/>{i !== words.length - 1 ? ', ' : '.'}</span>)
-        )
-    }
-</div>)
-
+import {reachMetricaGoal} from "./webAnalytics"
 
 class App extends Component {
     constructor() {
@@ -22,6 +14,7 @@ class App extends Component {
 
     changeWords() {
         this.setState({words: getWordsList()})
+        reachMetricaGoal('CHANGE_WORDS_LIST')
     }
 
     render() {
