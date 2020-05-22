@@ -24,7 +24,7 @@ class App extends Component {
             <div className="app-wrapper">
                 <div className="app-header">
                     <a target="_blank" href="https://vk.com/talentcity1" className="gt-logo"><img alt="Город талантов"
-                                                                                                  src="https://pp.userapi.com/0eJL973_dcofGpT3Z20_gywRTmn45Y9NUaiXMg/kALatrZnCIs.jpg?ava=1"/></a>
+                                                                                                  src="img/logo.jpg"/></a>
                     <p className="app-header-text">Оживление 50&nbsp;слов</p>
                 </div>
                 <div className="instructions">

@@ -605,7 +605,7 @@ var App = function (_Component) {
                         'a',
                         { target: '_blank', href: 'https://vk.com/talentcity1', className: 'gt-logo' },
                         _react2.default.createElement('img', { alt: '\u0413\u043E\u0440\u043E\u0434 \u0442\u0430\u043B\u0430\u043D\u0442\u043E\u0432',
-                            src: 'https://pp.userapi.com/0eJL973_dcofGpT3Z20_gywRTmn45Y9NUaiXMg/kALatrZnCIs.jpg?ava=1' })
+                            src: 'img/logo.jpg' })
                     ),
                     _react2.default.createElement(
                         'p',
@@ -782,7 +782,7 @@ exports = module.exports = __webpack_require__(12)(false);
 
 
 // module
-exports.push([module.i, "html {\n  font: 16px/1.5 'Helvetica', 'Arial', sans-serif;\n  position: relative;\n  min-height: 100%; }\n\nh1 {\n  color: #162556;\n  display: inline-block;\n  height: 78px; }\n\n.app-wrapper {\n  margin: 0 20px;\n  position: relative; }\n\n.app-header {\n  height: 100px;\n  margin-bottom: 20px;\n  display: table; }\n  .app-header-text {\n    font-size: 24px;\n    color: #162556;\n    position: relative;\n    display: table-cell;\n    vertical-align: middle; }\n\n.app-footer {\n  margin-top: 12vh; }\n\n.instructions {\n  background-color: #afbcff;\n  border: 1px dashed #565656;\n  padding: 15px;\n  border-radius: 10px;\n  margin-bottom: 15px;\n  margin-left: -15px; }\n\n.donation-wrapper {\n  position: relative;\n  bottom: 0;\n  left: 0; }\n\n.donation-button {\n  border: 1px solid yellow;\n  cursor: pointer;\n  background: #ffe5a3;\n  border-radius: 10px;\n  padding: 8px 13px 8px 9px;\n  font-size: 14px;\n  position: absolute;\n  right: 0;\n  bottom: 0; }\n\n.donation-form {\n  display: none;\n  position: absolute;\n  right: 0px;\n  bottom: 43px; }\n\n.gt-logo {\n  float: left;\n  margin-right: 20px;\n  height: 100px; }\n  .gt-logo img {\n    margin-bottom: -42px; }\n\n.words-list {\n  margin-bottom: 30px; }\n", ""]);
+exports.push([module.i, "html {\n  font: 16px/1.5 'Helvetica', 'Arial', sans-serif;\n  position: relative;\n  min-height: 100%; }\n\nh1 {\n  color: #162556;\n  display: inline-block;\n  height: 78px; }\n\n.app-wrapper {\n  margin: 0 20px;\n  position: relative; }\n\n.app-header {\n  height: 100px;\n  margin-bottom: 20px;\n  display: table; }\n  .app-header-text {\n    font-size: 24px;\n    color: #162556;\n    position: relative;\n    display: table-cell;\n    vertical-align: middle; }\n\n.app-footer {\n  margin-top: 12vh; }\n\n.instructions {\n  background-color: #afbcff;\n  border: 1px dashed #565656;\n  padding: 15px;\n  border-radius: 10px;\n  margin-bottom: 15px;\n  margin-left: -15px; }\n\n.donation-wrapper {\n  position: relative;\n  bottom: 0;\n  left: 0; }\n\n.donation-button {\n  border: 1px solid yellow;\n  cursor: pointer;\n  background: #ffe5a3;\n  border-radius: 10px;\n  padding: 8px 13px 8px 9px;\n  font-size: 14px;\n  position: absolute;\n  right: 0;\n  bottom: 0; }\n\n.donation-form {\n  display: none;\n  position: absolute;\n  right: 0px;\n  bottom: 43px; }\n\n.gt-logo {\n  float: left;\n  margin-right: 20px;\n  height: 100px; }\n  .gt-logo img {\n    margin-bottom: -42px;\n    width: 100px; }\n\n.words-list {\n  margin-bottom: 30px; }\n", ""]);
 
 // exports
 
